@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>OSRM Console - Full Features</title>
+    <title>OSRM Console - Ultimate + Fix Bogotá</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
@@ -37,7 +37,7 @@
 
         /* SIDEBAR */
         #sidebar {
-            width: 320px;
+            width: 350px;
             background: #f8f9fa;
             border-right: 1px solid #ddd;
             display: flex;
@@ -63,23 +63,28 @@
             padding: 15px;
         }
 
-        /* TABS DE SERVICIO */
+        /* TABS */
         .service-tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
             margin-bottom: 15px;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 8px 5px;
+            padding: 8px 4px;
             font-size: 0.75rem;
             cursor: pointer;
             border: 1px solid #ccc;
             background: white;
             border-radius: 3px;
             text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #eee;
         }
 
         .tab-btn.active {
@@ -89,19 +94,20 @@
             font-weight: bold;
         }
 
-        /* FORMULARIOS */
+        /* CONTROLES */
         .control-group {
             margin-bottom: 15px;
             background: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .control-group h4 {
             margin: 0 0 10px 0;
             font-size: 0.85rem;
-            color: #666;
+            color: var(--accent);
             text-transform: uppercase;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
@@ -110,27 +116,57 @@
         label {
             display: block;
             font-size: 0.8rem;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 4px;
+            color: #444;
+            font-weight: 600;
         }
 
         select,
         input[type="number"] {
             width: 100%;
-            padding: 6px;
+            padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 0.9rem;
+            background: #fff;
+            margin-bottom: 8px;
+        }
+
+        select:disabled {
+            background: #eee;
+            color: #999;
         }
 
         .checkbox-row {
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .checkbox-row input {
-            margin-right: 8px;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-row label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        /* LISTA DE PUNTOS */
+        #point-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        #point-list li {
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
         }
 
         /* BOTONES */
@@ -144,6 +180,8 @@
             font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
         }
 
         .btn-action:hover {
@@ -152,7 +190,11 @@
 
         .btn-clear {
             background: var(--danger);
-            margin-top: 5px;
+            margin-top: 8px;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
         }
 
         /* MAPA */
@@ -161,26 +203,27 @@
             background: #eee;
         }
 
-        /* PANEL DE DATOS (Bottom) */
+        /* PANEL INFERIOR */
         #data-panel {
             height: 250px;
             background: white;
-            border-top: 2px solid var(--accent);
+            border-top: 3px solid var(--accent);
             display: flex;
             flex-direction: column;
             transition: height 0.3s;
+            z-index: 20;
         }
 
         .panel-tabs {
             display: flex;
-            background: #eee;
+            background: #f1f1f1;
             border-bottom: 1px solid #ddd;
         }
 
         .panel-tab {
-            padding: 8px 15px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #666;
         }
@@ -188,38 +231,39 @@
         .panel-tab.active {
             background: white;
             color: var(--accent);
-            border-top: 2px solid var(--accent);
-            margin-top: -2px;
+            border-top: 3px solid var(--accent);
+            margin-top: -3px;
         }
 
         .panel-content {
             flex: 1;
             overflow: auto;
-            padding: 15px;
-            font-family: monospace;
-            font-size: 0.85rem;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
         }
 
-        /* ESTILOS ESPECIFICOS DE RESULTADOS */
+        /* VISUALIZACIÓN JSON/TABLA */
         .json-pre {
             white-space: pre-wrap;
-            color: #333;
+            color: #2c3e50;
         }
 
         .matrix-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.8rem;
         }
 
         .matrix-table th,
         .matrix-table td {
             border: 1px solid #ddd;
-            padding: 5px;
+            padding: 6px;
             text-align: center;
         }
 
         .matrix-table th {
-            background: #f0f0f0;
+            background: #f9f9f9;
         }
 
         .highlight-val {
@@ -227,7 +271,7 @@
             font-weight: bold;
         }
 
-        /* Instruction Steps */
+        /* Steps */
         .step-list {
             list-style: none;
             padding: 0;
@@ -235,20 +279,28 @@
         }
 
         .step-item {
-            padding: 5px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #eee;
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .step-icon {
             font-weight: bold;
-            color: var(--accent);
+            color: white;
+            background: var(--accent);
             width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 12px;
         }
     </style>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdY17gpwgszK7sKVQRlsuDCvM4XNQEmrU&libraries=geometry"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=geometry"></script>
 </head>
 
 <body>
@@ -258,7 +310,7 @@
             <aside id="sidebar">
                 <div id="sidebar-header">
                     <h2>OSRM Console</h2>
-                    <small>Docker Localhost:5000</small>
+                    <small id="api-status">Conectando a localhost:5000...</small>
                 </div>
                 <div id="sidebar-content">
 
@@ -270,17 +322,17 @@
                         <div class="tab-btn" onclick="setService('nearest')">Nearest</div>
                     </div>
 
-                    <p id="desc-text" style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px;">
+                    <p id="desc-text"
+                        style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px; min-height: 30px;">
                         Ruta punto a punto estándar.
                     </p>
 
-                    <div id="params-container">
-                    </div>
+                    <div id="params-container"></div>
 
                     <div class="control-group">
                         <h4>Puntos (<span id="point-count">0</span>)</h4>
-                        <ul id="point-list" style="padding-left: 15px; font-size: 0.8rem; margin: 0; color: #555;">
-                            <li>Clic en el mapa para agregar...</li>
+                        <ul id="point-list">
+                            <li style="font-style:italic; color:#999;">Haz clic en el mapa para agregar...</li>
                         </ul>
                     </div>
 
@@ -296,7 +348,8 @@
             <div class="panel-tabs">
                 <div class="panel-tab active" onclick="setPanelTab('summary')">Resumen Visual</div>
                 <div class="panel-tab" onclick="setPanelTab('json')">JSON Crudo (API)</div>
-                <div class="panel-tab" onclick="togglePanel()" style="margin-left: auto; font-size: 1.2rem;">↕</div>
+                <div class="panel-tab" onclick="togglePanel()"
+                    style="margin-left: auto; font-size: 1.2rem; padding: 5px 15px;">↕</div>
             </div>
             <div id="panel-content-area" class="panel-content">
                 <div id="view-summary">Esperando datos...</div>
@@ -311,97 +364,97 @@
         // --- CONFIGURACIÓN ---
         const API_BASE = "http://localhost:5000";
 
-        // --- ESTADO ---
+        // --- ESTADO GLOBAL ---
         let currentService = 'route';
         let map;
         let points = []; // {lat, lng, marker}
-        let resultObjects = []; // Polylines, markers de resultado, etc.
+        let resultObjects = []; // Polylines, markers, etc.
+        let isPanelOpen = true;
 
-        // --- DEFINICIÓN DE SERVICIOS Y PARÁMETROS ---
+        // --- DEFINICIÓN DE SERVICIOS Y UI ---
         const servicesConfig = {
             route: {
-                desc: "Ruta óptima entre 2 o más puntos ordenados. Soporta pasos y alternativas.",
+                desc: "Ruta directa entre puntos (Orden Fijo).",
                 params: `
-                    <div class="control-group">
-                        <h4>Opciones de Ruta</h4>
-                        <div class="checkbox-row"><input type="checkbox" id="p-steps" checked> <label>Steps (Instrucciones)</label></div>
-                        <div class="checkbox-row"><input type="checkbox" id="p-overview" checked> <label>Overview (Geometría Completa)</label></div>
-                        <div class="checkbox-row"><input type="checkbox" id="p-alternatives"> <label>Alternativas</label></div>
-                    </div>`
+            <div class="control-group">
+                <h4>Opciones de Ruta</h4>
+                <div class="checkbox-row"><input type="checkbox" id="p-steps" checked> <label>Steps (Instrucciones)</label></div>
+                <div class="checkbox-row"><input type="checkbox" id="p-overview" checked> <label>Overview (Geometría)</label></div>
+                <div class="checkbox-row"><input type="checkbox" id="p-alternatives"> <label>Alternativas</label></div>
+            </div>`
             },
             trip: {
-                desc: "Resuelve el Problema del Viajante (TSP). Reordena tus puntos para la ruta más eficiente.",
+                desc: "Optimización TSP. Reordena para la ruta más eficiente.",
                 params: `
-                    <div class="control-group">
-                        <h4>Configuración TSP</h4>
-                        <label>Roundtrip (Circular)</label>
-                        <select id="p-roundtrip">
-                            <option value="false">Falso (A -> Z)</option>
-                            <option value="true">Verdadero (A -> A)</option>
-                        </select>
-                        <label style="margin-top:5px">Source (Inicio)</label>
-                        <select id="p-source">
-                            <option value="first">First (Fijo)</option>
-                            <option value="any">Any (Cualquiera)</option>
-                        </select>
-                        <label style="margin-top:5px">Destination (Fin)</label>
-                        <select id="p-destination">
-                            <option value="last">Last (Fijo)</option>
-                            <option value="any">Any (Cualquiera)</option>
-                        </select>
-                    </div>`
+            <div class="control-group">
+                <h4>Estrategia TSP</h4>
+                <label>1. Tipo de Viaje</label>
+                <select id="p-roundtrip" onchange="updateTripOptions()">
+                    <option value="true">Circular (Optimización Libre)</option>
+                    <option value="false">Lineal Estricto (A -> Z)</option>
+                </select>
+                <div id="trip-extra-opts">
+                    <label>2. Inicio</label>
+                    <select id="p-source">
+                        <option value="first">Fijo (Primer Click)</option>
+                        <option value="any">Cualquiera</option>
+                    </select>
+                    <label>3. Destino</label>
+                    <select id="p-destination">
+                        <option value="any" selected>Cualquiera (Recomendado)</option>
+                        <option value="last">Fijo (Último Click)</option>
+                    </select>
+                </div>
+                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
+                   <small style="color:#e67e22;">* Usa "Circular + Destino Cualquiera" para corregir el zig-zag.</small>
+                </div>
+            </div>`
             },
             table: {
-                desc: "Calcula matrices N x M de tiempos y distancias entre todos los puntos.",
+                desc: "Matriz de tiempos todos contra todos (N x M).",
                 params: `
-                    <div class="control-group">
-                        <h4>Anotaciones</h4>
-                        <label>Annotations</label>
-                        <select id="p-annotations">
-                            <option value="duration">Solo Duración</option>
-                            <option value="distance">Solo Distancia</option>
-                            <option value="duration,distance">Ambas</option>
-                        </select>
-                    </div>`
+            <div class="control-group">
+                <h4>Opciones Tabla</h4>
+                <label>Resultados</label>
+                <select id="p-annotations">
+                    <option value="duration">Solo Duración</option>
+                    <option value="distance">Solo Distancia</option>
+                    <option value="duration,distance">Ambas</option>
+                </select>
+            </div>`
             },
             match: {
-                desc: "Map Matching. Ajusta puntos GPS 'sucios' a la red vial real.",
+                desc: "Map Matching. Ajusta GPS impreciso a la calle.",
                 params: `
-                    <div class="control-group">
-                        <h4>Opciones Matching</h4>
-                        <div class="checkbox-row"><input type="checkbox" id="p-steps"> <label>Steps (Instrucciones)</label></div>
-                        <label>Gaps (Brechas)</label>
-                        <select id="p-gaps">
-                            <option value="split">Split (Cortar si está lejos)</option>
-                            <option value="ignore">Ignore (Forzar unión)</option>
-                        </select>
-                        <label>Tidy (Limpiar ruido)</label>
-                        <select id="p-tidy">
-                            <option value="true">True</option>
-                            <option value="false">False</option>
-                        </select>
-                    </div>`
+            <div class="control-group">
+                <h4>Opciones Match</h4>
+                <div class="checkbox-row"><input type="checkbox" id="p-steps"> <label>Instrucciones</label></div>
+                <label>Gaps (Brechas)</label>
+                <select id="p-gaps"><option value="split">Split</option><option value="ignore">Ignore</option></select>
+                <label>Tidy (Limpiar)</label>
+                <select id="p-tidy"><option value="true">True</option><option value="false">False</option></select>
+            </div>`
             },
             nearest: {
-                desc: "Encuentra el punto más cercano en la calle (Snap).",
+                desc: "Encuentra el punto de la calle más cercano (Snap).",
                 params: `
-                    <div class="control-group">
-                        <h4>Opciones Nearest</h4>
-                        <label>Número de resultados</label>
-                        <input type="number" id="p-number" value="1" min="1" max="10">
-                    </div>
-                    <small style="color:orange">Nota: Solo usa el último punto clicado.</small>`
+            <div class="control-group">
+                <h4>Opciones Nearest</h4>
+                <label>Cantidad</label>
+                <input type="number" id="p-number" value="1" min="1" max="5">
+            </div>
+            <small>Usa solo el último punto.</small>`
             }
         };
 
         // --- INICIALIZACIÓN ---
         function initMap() {
             const mapEl = document.getElementById('map');
-            if (!mapEl) return; // Seguridad
+            if (!mapEl) return;
 
             map = new google.maps.Map(mapEl, {
-                zoom: 12,
-                center: { lat: 4.60971, lng: -74.08175 },
+                zoom: 13,
+                center: { lat: 4.62, lng: -74.10 }, // Centro geográfico aprox
                 clickableIcons: false,
                 disableDefaultUI: true,
                 zoomControl: true
@@ -411,64 +464,46 @@
                 addPoint(e.latLng.lat(), e.latLng.lng());
             });
 
-            // Cargar UI inicial
             setService('route');
         }
 
-        // --- LOGICA UI (CORREGIDA) ---
+        // --- LÓGICA UI ---
         function setService(service) {
             currentService = service;
 
-            // 1. Gestión de Tabs (Sin usar 'event' para evitar el error)
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(t => t.classList.remove('active'));
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+            const active = tabs.find(t => t.innerText.toLowerCase().includes(service.substr(0, 3)));
+            if (active) active.classList.add('active');
 
-            // Busca el botón correspondiente al servicio y actívalo
-            const activeBtn = Array.from(tabs).find(t => t.innerText.toLowerCase().includes(service.substring(0, 3)));
-            if (activeBtn) activeBtn.classList.add('active');
+            // Params
+            const desc = document.getElementById('desc-text');
+            if (desc) desc.innerText = servicesConfig[service].desc;
 
-            // 2. Actualización de Contenido (Con validación de nulos)
-            const descEl = document.getElementById('desc-text');
-            if (descEl) descEl.innerText = servicesConfig[service].desc;
-
-            const paramsEl = document.getElementById('params-container');
-            if (paramsEl) paramsEl.innerHTML = servicesConfig[service].params;
-
-            // Limpieza específica si es necesario
-            if (service === 'nearest' && points.length > 1) {
-                // Opcional: lógica extra
+            const container = document.getElementById('params-container');
+            if (container) {
+                container.innerHTML = servicesConfig[service].params;
+                if (service === 'trip') updateTripOptions();
             }
+
+            if (service === 'nearest' && points.length > 1) clearAll();
         }
 
-        function setPanelTab(tabName) {
-            const tabs = document.querySelectorAll('.panel-tab');
-            tabs.forEach(t => t.classList.remove('active'));
+        // Validaciones Lógicas de OSRM para Trip
+        window.updateTripOptions = function () {
+            const isRound = document.getElementById('p-roundtrip').value === 'true';
+            const src = document.getElementById('p-source');
+            const dst = document.getElementById('p-destination');
 
-            const viewSummary = document.getElementById('view-summary');
-            const viewJson = document.getElementById('view-json');
-
-            if (tabName === 'summary') {
-                if (tabs[0]) tabs[0].classList.add('active');
-                if (viewSummary) viewSummary.style.display = 'block';
-                if (viewJson) viewJson.style.display = 'none';
+            if (!isRound) {
+                // OSRM Regla: Si roundtrip=false, source debe ser first y destination last
+                src.value = 'first'; src.disabled = true;
+                dst.value = 'last'; dst.disabled = true;
             } else {
-                if (tabs[1]) tabs[1].classList.add('active');
-                if (viewSummary) viewSummary.style.display = 'none';
-                if (viewJson) viewJson.style.display = 'block';
+                src.disabled = false;
+                dst.disabled = false;
             }
-        }
-
-        let isPanelOpen = true;
-        function togglePanel() {
-            const panel = document.getElementById('data-panel');
-            if (!panel) return;
-
-            if (isPanelOpen) {
-                panel.style.height = '40px'; // Colapsado
-            } else {
-                panel.style.height = '250px'; // Expandido
-            }
-            isPanelOpen = !isPanelOpen;
         }
 
         function addPoint(lat, lng) {
@@ -477,8 +512,10 @@
             const marker = new google.maps.Marker({
                 position: { lat, lng },
                 map: map,
-                label: (points.length + 1).toString()
+                label: { text: (points.length + 1).toString(), color: "white" },
+                title: `Punto ${points.length + 1}`
             });
+
             points.push({ lat, lng, marker });
             updatePointList();
         }
@@ -486,12 +523,14 @@
         function updatePointList() {
             const list = document.getElementById('point-list');
             const count = document.getElementById('point-count');
-
             if (count) count.innerText = points.length;
+
             if (list) {
                 list.innerHTML = "";
+                if (points.length === 0) list.innerHTML = "<li style='color:#999'>Clic en el mapa...</li>";
+
                 points.forEach((p, i) => {
-                    list.innerHTML += `<li>#${i + 1}: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</li>`;
+                    list.innerHTML += `<li><strong>P${i + 1}</strong> <span>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></li>`;
                 });
             }
         }
@@ -499,215 +538,242 @@
         function clearAll() {
             points.forEach(p => p.marker.setMap(null));
             points = [];
-            resultObjects.forEach(o => o.setMap ? o.setMap(null) : null);
+            resultObjects.forEach(o => o.setMap(null));
             resultObjects = [];
-
             updatePointList();
-
-            const summary = document.getElementById('view-summary');
-            if (summary) summary.innerText = "Esperando datos...";
-
-            const jsonView = document.getElementById('view-json');
-            if (jsonView) jsonView.innerHTML = '<pre class="json-pre">{}</pre>';
+            document.getElementById('view-summary').innerText = "Esperando datos...";
+            document.getElementById('view-json').innerHTML = "<pre class='json-pre'>{}</pre>";
         }
 
-        // --- EJECUCIÓN API (CORE) ---
+        function setPanelTab(mode) {
+            const tabs = document.querySelectorAll('.panel-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const summary = document.getElementById('view-summary');
+            const json = document.getElementById('view-json');
+
+            if (mode === 'summary') {
+                tabs[0].classList.add('active');
+                summary.style.display = 'block';
+                json.style.display = 'none';
+            } else {
+                tabs[1].classList.add('active');
+                summary.style.display = 'none';
+                json.style.display = 'block';
+            }
+        }
+
+        function togglePanel() {
+            const p = document.getElementById('data-panel');
+            if (isPanelOpen) p.style.height = '45px';
+            else p.style.height = '250px';
+            isPanelOpen = !isPanelOpen;
+        }
+
+        // --- EJECUCIÓN DE LA API (VERSIÓN ROBUSTA) ---
         async function executeService() {
-            if (points.length === 0) { alert("Agrega puntos en el mapa primero."); return; }
+            if (points.length < 2 && currentService !== 'nearest') { alert("Agrega al menos 2 puntos."); return; }
 
             const statusDiv = document.getElementById('view-summary');
-            if (statusDiv) statusDiv.innerHTML = "⏳ Consultando API...";
+            statusDiv.innerHTML = "⏳ Consultando API Docker...";
 
+            // 1. Base URL (Sin Query Params ni signos de interrogación)
             const coords = points.map(p => `${p.lng},${p.lat}`).join(';');
-            let url = `${API_BASE}/${currentService}/v1/driving/${coords}?`;
+            const baseUrl = `${API_BASE}/${currentService}/v1/driving/${coords}`;
 
+            // 2. Gestor de Parámetros (Se encarga de los ? y & automáticamente)
             const params = new URLSearchParams();
 
-            if (currentService === 'route') {
-                params.append('overview', document.getElementById('p-overview').checked ? 'full' : 'simplified');
-                params.append('steps', document.getElementById('p-steps').checked);
-                if (document.getElementById('p-alternatives').checked) params.append('alternatives', 3);
+            // --- Parámetros Globales ---
+            if (currentService !== 'table' && currentService !== 'nearest') {
+                params.append('overview', document.getElementById('p-overview') && document.getElementById('p-overview').checked ? 'full' : 'full');
                 params.append('geometries', 'polyline');
             }
+
+            // --- Fix Bogotá (Approaches) ---
+            if (currentService === 'route' || currentService === 'trip') {
+                const approaches = points.map(() => 'curb').join(';');
+                params.append('approaches', approaches);
+            }
+
+            // --- Parámetros Específicos ---
+            if (currentService === 'route') {
+                params.append('steps', document.getElementById('p-steps').checked);
+                if (document.getElementById('p-alternatives').checked) params.append('alternatives', 3);
+            }
             else if (currentService === 'trip') {
-                // LÓGICA AUTOMÁTICA PARA EVITAR ERROR "NotImplemented"
-                const isRoundtrip = document.getElementById('p-roundtrip').value;
-                if (isRoundtrip === 'false') {
-                    // Si es solo ida, forzamos source=first y dest=last
-                    params.append('roundtrip', 'false');
-                    params.append('source', 'first');
-                    params.append('destination', 'last');
-                } else {
-                    params.append('roundtrip', 'true');
-                    params.append('source', document.getElementById('p-source').value);
-                    params.append('destination', document.getElementById('p-destination').value);
-                }
-                params.append('overview', 'full');
-                params.append('geometries', 'polyline');
+                params.append('roundtrip', document.getElementById('p-roundtrip').value);
+                params.append('source', document.getElementById('p-source').value);
+                params.append('destination', document.getElementById('p-destination').value);
+                params.append('steps', 'true');
+                params.append('annotations', 'duration,distance');
             }
             else if (currentService === 'table') {
                 params.append('annotations', document.getElementById('p-annotations').value);
             }
             else if (currentService === 'match') {
-                params.append('overview', 'full');
-                params.append('geometries', 'polyline');
                 params.append('steps', document.getElementById('p-steps').checked);
                 params.append('tidy', document.getElementById('p-tidy').value);
                 params.append('gaps', document.getElementById('p-gaps').value);
+                const radiuses = points.map(() => '50').join(';');
+                params.append('radiuses', radiuses);
             }
             else if (currentService === 'nearest') {
                 params.append('number', document.getElementById('p-number').value);
             }
 
             try {
-                const fullUrl = url + params.toString();
-                console.log("Fetching:", fullUrl);
-                const response = await fetch(fullUrl);
-                const data = await response.json();
+                // 3. Construcción Final Automática
+                const finalUrl = `${baseUrl}?${params.toString()}`;
 
-                // Mostrar JSON Crudo
-                const jsonPre = document.querySelector('#view-json .json-pre');
-                if (jsonPre) jsonPre.innerText = JSON.stringify(data, null, 2);
+                console.log("Request:", finalUrl);
+                const res = await fetch(finalUrl);
+                const data = await res.json();
 
-                if (data.code !== 'Ok') throw new Error(data.code + ": " + (data.message || ""));
+                document.querySelector('#view-json .json-pre').innerText = JSON.stringify(data, null, 2);
+
+                if (data.code !== 'Ok') {
+                    if (data.code === 'NoSegment') throw new Error("Punto lejos de la vía (NoSegment).");
+                    throw new Error(`API Error: ${data.code} - ${data.message || ''}`);
+                }
 
                 renderResults(data);
 
             } catch (e) {
-                if (statusDiv) statusDiv.innerHTML = `<span style="color:red; font-weight:bold">ERROR: ${e.message}</span>`;
+                statusDiv.innerHTML = `<div style="color:red; font-weight:bold">Error: ${e.message}</div>`;
                 console.error(e);
             }
         }
 
         // --- RENDERIZADO DE RESULTADOS ---
         function renderResults(data) {
-            // Limpiar visuales anteriores
-            resultObjects.forEach(o => o.setMap ? o.setMap(null) : null);
+            // Clear
+            resultObjects.forEach(o => o.setMap(null));
             resultObjects = [];
 
             const container = document.getElementById('view-summary');
-            if (!container) return;
             container.innerHTML = "";
 
-            switch (currentService) {
+            // 1. ROUTE & TRIP
+            if (currentService === 'route' || currentService === 'trip') {
+                const routes = data.routes || data.trips;
+                if (!routes || routes.length === 0) { container.innerHTML = "Sin resultados."; return; }
 
-                case 'route':
-                case 'trip':
-                    const routes = data.routes || data.trips;
-                    if (!routes || routes.length === 0) { container.innerHTML = "No se encontraron rutas."; return; }
+                // Visualización del Orden TSP
+                if (currentService === 'trip' && data.waypoints) {
+                    const sorted = data.waypoints.sort((a, b) => a.trips_index - b.trips_index);
 
-                    routes.forEach((r, idx) => {
-                        const color = idx === 0 ? '#007bff' : '#999';
-                        const weight = idx === 0 ? 6 : 4;
-                        const zIndex = idx === 0 ? 10 : 1;
+                    let html = `<div style="background:#e8f5e9; padding:10px; border-radius:5px; margin-bottom:10px;">`;
+                    html += `<strong style="color:#27ae60">🏁 Orden Optimizado:</strong><br>`;
 
-                        drawPolyline(r.geometry, color, weight, zIndex);
+                    // Lógica visual para simplificar la lectura
+                    html += sorted.map(wp => {
+                        const idx = wp.waypoint_index + 1;
+                        return `<span style="background:white; border:1px solid #ccc; padding:2px 6px; border-radius:4px; font-weight:bold;">P${idx}</span>`;
+                    }).join(' ➔ ');
+                    html += `</div>`;
+                    container.innerHTML += html;
+                }
 
-                        container.innerHTML += `
-                            <div style="margin-bottom:10px; border-bottom:1px solid #ccc; padding-bottom:5px;">
-                                <strong>${idx === 0 ? 'Ruta Principal' : 'Alternativa'}</strong><br>
-                                Distancia: <span class="highlight-val">${(r.distance / 1000).toFixed(2)} km</span><br>
-                                Tiempo: <span class="highlight-val">${(r.duration / 60).toFixed(1)} min</span>
-                            </div>`;
+                routes.forEach((r, idx) => {
+                    const color = idx === 0 ? '#3498db' : '#95a5a6';
+                    const zIndex = idx === 0 ? 10 : 5;
 
-                        if (r.legs && r.legs[0].steps && idx === 0) {
-                            let stepsHtml = '<ul class="step-list">';
-                            r.legs.forEach(leg => {
-                                leg.steps.forEach(step => {
-                                    if (step.maneuver.type) {
-                                        stepsHtml += `<li class="step-item"><span class="step-icon">↱</span> ${step.name || "Calle sin nombre"} (${step.distance}m)</li>`;
-                                    }
-                                });
+                    drawPolyline(r.geometry, color);
+
+                    let info = `<div style="border-bottom:1px solid #eee; padding:8px 0;">`;
+                    info += `<strong>${currentService === 'trip' ? 'Viaje Optimizado' : (idx === 0 ? 'Ruta Principal' : 'Alternativa')}</strong><br>`;
+                    info += `Dist: <span class="highlight-val">${(r.distance / 1000).toFixed(2)} km</span> | `;
+                    info += `Tiempo: <span class="highlight-val">${(r.duration / 60).toFixed(1)} min</span>`;
+
+                    // Steps (Collapsible)
+                    if (r.legs && r.legs[0].steps && idx === 0) {
+                        let stepsHtml = `<ul class="step-list">`;
+                        r.legs.forEach((leg, lIdx) => {
+                            stepsHtml += `<li style="background:#eee; padding:4px; font-size:0.8rem;">Tramo ${lIdx + 1}</li>`;
+                            leg.steps.forEach(s => {
+                                if (s.maneuver && s.maneuver.type) {
+                                    let icon = "↱";
+                                    if (s.maneuver.type.includes("left")) icon = "↰";
+                                    if (s.maneuver.type.includes("right")) icon = "↱";
+                                    if (s.maneuver.type === "arrive") icon = "🏁";
+
+                                    stepsHtml += `<li class="step-item"><span class="step-icon">${icon}</span> <span>${s.name || "Calle"} <small>(${s.distance}m)</small></span></li>`;
+                                }
                             });
-                            stepsHtml += '</ul>';
-                            container.innerHTML += `<details><summary>Ver Instrucciones</summary>${stepsHtml}</details>`;
+                        });
+                        stepsHtml += `</ul>`;
+                        info += `<details style="margin-top:5px;"><summary style="cursor:pointer; color:#3498db;">Ver Instrucciones</summary>${stepsHtml}</details>`;
+                    }
+                    info += `</div>`;
+                    container.innerHTML += info;
+                });
+            }
+
+            // 2. TABLE
+            else if (currentService === 'table') {
+                let html = `<table class="matrix-table"><thead><tr><th>Dest\\Orig</th>`;
+                data.sources.forEach((s, i) => html += `<th>P${i + 1}</th>`);
+                html += `</tr></thead><tbody>`;
+
+                data.destinations.forEach((d, rowIdx) => {
+                    html += `<tr><td><strong>P${rowIdx + 1}</strong></td>`;
+                    data.sources.forEach((s, colIdx) => {
+                        let val = "";
+                        if (data.durations) val += `${(data.durations[colIdx][rowIdx] / 60).toFixed(0)}m `;
+                        if (data.distances) val += `<small>(${(data.distances[colIdx][rowIdx] / 1000).toFixed(1)}km)</small>`;
+                        html += `<td>${val || '-'}</td>`;
+                    });
+                    html += `</tr>`;
+                });
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            }
+
+            // 3. MATCH & NEAREST
+            else if (currentService === 'match' || currentService === 'nearest') {
+
+                if (data.matchings) {
+                    data.matchings.forEach(m => {
+                        drawPolyline(m.geometry, '#9b59b6');
+                        container.innerHTML += `<div><strong>Confianza: ${(m.confidence * 100).toFixed(0)}%</strong></div>`;
+                    });
+                }
+
+                if (data.tracepoints || data.waypoints) {
+                    const pts = data.tracepoints || data.waypoints;
+                    pts.forEach(pt => {
+                        if (!pt) return;
+                        const pos = { lat: pt.location[1], lng: pt.location[0] };
+
+                        // Draw snap marker
+                        const m = new google.maps.Marker({
+                            position: pos, map: map,
+                            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 4, fillColor: "#9b59b6", strokeColor: "white", strokeWeight: 1, fillOpacity: 1 }
+                        });
+                        resultObjects.push(m);
+
+                        // Draw connection line (for nearest)
+                        if (currentService === 'nearest' && points[0]) {
+                            const line = new google.maps.Polyline({
+                                path: [{ lat: points[0].lat, lng: points[0].lng }, pos],
+                                map: map, strokeColor: '#e74c3c', strokeOpacity: 0.5
+                            });
+                            resultObjects.push(line);
+                            container.innerHTML += `<div>Calle: <strong>${pt.name}</strong> (${pt.distance.toFixed(1)}m)</div>`;
                         }
                     });
-
-                    if (data.waypoints && currentService === 'trip') {
-                        let orderHtml = "<strong>Orden Optimizado:</strong> ";
-                        const sorted = data.waypoints.sort((a, b) => a.trips_index - b.trips_index);
-                        orderHtml += sorted.map(wp => `#${wp.waypoint_index + 1}`).join(' ➔ ');
-                        container.innerHTML += `<div style="margin-top:10px; color:var(--success)">${orderHtml}</div>`;
-                    }
-                    break;
-
-                case 'table':
-                    let tableHtml = "<table class='matrix-table'><thead><tr><th>Dest \\ Origen</th>";
-                    data.sources.forEach((s, i) => tableHtml += `<th>P${i + 1}</th>`);
-                    tableHtml += "</tr></thead><tbody>";
-
-                    data.destinations.forEach((d, i) => {
-                        tableHtml += `<tr><td><strong>P${i + 1}</strong></td>`;
-                        data.sources.forEach((s, j) => {
-                            let cellInfo = "";
-                            if (data.durations) cellInfo += `${(data.durations[j][i] / 60).toFixed(1)}m`;
-                            if (data.distances) cellInfo += `<br><small>${(data.distances[j][i] / 1000).toFixed(2)}km</small>`;
-                            tableHtml += `<td>${cellInfo || '-'}</td>`;
-                        });
-                        tableHtml += "</tr>";
-                    });
-                    tableHtml += "</tbody></table>";
-                    container.innerHTML = tableHtml;
-                    break;
-
-                case 'match':
-                    if (data.matchings) {
-                        data.matchings.forEach(m => {
-                            drawPolyline(m.geometry, '#8e44ad', 6, 10);
-                            container.innerHTML += `<div><strong>Confianza: ${(m.confidence * 100).toFixed(1)}%</strong></div>`;
-                        });
-                    }
-                    if (data.tracepoints) {
-                        data.tracepoints.forEach(tp => {
-                            if (tp) {
-                                const snapMarker = new google.maps.Marker({
-                                    position: { lat: tp.location[1], lng: tp.location[0] },
-                                    map: map,
-                                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 4, fillColor: "#8e44ad", fillOpacity: 1, strokeColor: 'white', strokeWeight: 1 },
-                                    title: "Snapped Point"
-                                });
-                                resultObjects.push(snapMarker);
-                            }
-                        });
-                    }
-                    break;
-
-                case 'nearest':
-                    if (data.waypoints && data.waypoints.length > 0) {
-                        data.waypoints.forEach(wp => {
-                            const snapPos = { lat: wp.location[1], lng: wp.location[0] };
-                            const origPos = { lat: points[0].lat, lng: points[0].lng };
-
-                            const connLine = new google.maps.Polyline({
-                                path: [origPos, snapPos],
-                                map: map,
-                                strokeColor: '#e74c3c', strokeOpacity: 0.5, strokeWeight: 2,
-                                icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW }, offset: '100%' }]
-                            });
-                            resultObjects.push(connLine);
-
-                            const snapMarker = new google.maps.Marker({
-                                position: snapPos, map: map,
-                                title: wp.name,
-                                icon: { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale: 5, fillColor: "#27ae60", fillOpacity: 1, strokeWeight: 1 }
-                            });
-                            resultObjects.push(snapMarker);
-
-                            container.innerHTML += `<div><strong>Calle:</strong> ${wp.name || "Sin nombre"} (${wp.distance.toFixed(2)}m)</div>`;
-                        });
-                    }
-                    break;
+                }
             }
         }
 
-        function drawPolyline(encodedGeo, color, weight, zIndex) {
-            const path = google.maps.geometry.encoding.decodePath(encodedGeo);
-            const polyline = new google.maps.Polyline({
-                path: path, geodesic: true, strokeColor: color, strokeOpacity: 0.8, strokeWeight: weight, zIndex: zIndex
+        function drawPolyline(encoded, color) {
+            const path = google.maps.geometry.encoding.decodePath(encoded);
+            const poly = new google.maps.Polyline({
+                path: path, geodesic: true, strokeColor: color, strokeOpacity: 0.8, strokeWeight: 5, map: map
             });
-            polyline.setMap(map);
-            resultObjects.push(polyline);
+            resultObjects.push(poly);
+
             const bounds = new google.maps.LatLngBounds();
             path.forEach(p => bounds.extend(p));
             map.fitBounds(bounds);
