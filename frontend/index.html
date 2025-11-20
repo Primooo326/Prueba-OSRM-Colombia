@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>OSRM Console - Full Features</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        /* LAYOUT */
+        #app {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        #main-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: 320px;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        #sidebar-header {
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+        }
+
+        #sidebar-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        #sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        /* TABS DE SERVICIO */
+        .service-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* FORMULARIOS */
+        .control-group {
+            margin-bottom: 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+
+        .control-group h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-row input {
+            margin-right: 8px;
+        }
+
+        /* BOTONES */
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-action:hover {
+            background: #219150;
+        }
+
+        .btn-clear {
+            background: var(--danger);
+            margin-top: 5px;
+        }
+
+        /* MAPA */
+        #map {
+            flex: 1;
+            background: #eee;
+        }
+
+        /* PANEL DE DATOS (Bottom) */
+        #data-panel {
+            height: 250px;
+            background: white;
+            border-top: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            transition: height 0.3s;
+        }
+
+        .panel-tabs {
+            display: flex;
+            background: #eee;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .panel-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .panel-tab.active {
+            background: white;
+            color: var(--accent);
+            border-top: 2px solid var(--accent);
+            margin-top: -2px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* ESTILOS ESPECIFICOS DE RESULTADOS */
+        .json-pre {
+            white-space: pre-wrap;
+            color: #333;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .matrix-table th {
+            background: #f0f0f0;
+        }
+
+        .highlight-val {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Instruction Steps */
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .step-icon {
+            font-weight: bold;
+            color: var(--accent);
+            width: 20px;
+        }
+    </style>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdY17gpwgszK7sKVQRlsuDCvM4XNQEmrU&libraries=geometry"></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <div id="main-area">
+            <aside id="sidebar">
+                <div id="sidebar-header">
+                    <h2>OSRM Console</h2>
+                    <small>Docker Localhost:5000</small>
+                </div>
+                <div id="sidebar-content">
+
+                    <div class="service-tabs">
+                        <div class="tab-btn active" onclick="setService('route')">Route</div>
+                        <div class="tab-btn" onclick="setService('trip')">Trip (TSP)</div>
+                        <div class="tab-btn" onclick="setService('table')">Table</div>
+                        <div class="tab-btn" onclick="setService('match')">Match</div>
+                        <div class="tab-btn" onclick="setService('nearest')">Nearest</div>
+                    </div>
+
+                    <p id="desc-text" style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px;">
+                        Ruta punto a punto estándar.
+                    </p>
+
+                    <div id="params-container">
+                    </div>
+
+                    <div class="control-group">
+                        <h4>Puntos (<span id="point-count">0</span>)</h4>
+                        <ul id="point-list" style="padding-left: 15px; font-size: 0.8rem; margin: 0; color: #555;">
+                            <li>Clic en el mapa para agregar...</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn-action" onclick="executeService()">EJECUTAR CONSULTA</button>
+                    <button class="btn-action btn-clear" onclick="clearAll()">LIMPIAR TODO</button>
+                </div>
+            </aside>
+
+            <div id="map"></div>
+        </div>
+
+        <div id="data-panel">
+            <div class="panel-tabs">
+                <div class="panel-tab active" onclick="setPanelTab('summary')">Resumen Visual</div>
+                <div class="panel-tab" onclick="setPanelTab('json')">JSON Crudo (API)</div>
+                <div class="panel-tab" onclick="togglePanel()" style="margin-left: auto; font-size: 1.2rem;">↕</div>
+            </div>
+            <div id="panel-content-area" class="panel-content">
+                <div id="view-summary">Esperando datos...</div>
+                <div id="view-json" style="display:none;">
+                    <pre class="json-pre">{}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const API_BASE = "http://localhost:5000";
+
+        // --- ESTADO ---
+        let currentService = 'route';
+        let map;
+        let points = []; // {lat, lng, marker}
+        let resultObjects = []; // Polylines, markers de resultado, etc.
+
+        // --- DEFINICIÓN DE SERVICIOS Y PARÁMETROS ---
+        const servicesConfig = {
+            route: {
+                desc: "Ruta óptima entre 2 o más puntos ordenados. Soporta pasos y alternativas.",
+                params: `
+                    <div class="control-group">
+                        <h4>Opciones de Ruta</h4>
+                        <div class="checkbox-row"><input type="checkbox" id="p-steps" checked> <label>Steps (Instrucciones)</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="p-overview" checked> <label>Overview (Geometría Completa)</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="p-alternatives"> <label>Alternativas</label></div>
+                    </div>`
+            },
+            trip: {
+                desc: "Resuelve el Problema del Viajante (TSP). Reordena tus puntos para la ruta más eficiente.",
+                params: `
+                    <div class="control-group">
+                        <h4>Configuración TSP</h4>
+                        <label>Roundtrip (Circular)</label>
+                        <select id="p-roundtrip">
+                            <option value="false">Falso (A -> Z)</option>
+                            <option value="true">Verdadero (A -> A)</option>
+                        </select>
+                        <label style="margin-top:5px">Source (Inicio)</label>
+                        <select id="p-source">
+                            <option value="first">First (Fijo)</option>
+                            <option value="any">Any (Cualquiera)</option>
+                        </select>
+                        <label style="margin-top:5px">Destination (Fin)</label>
+                        <select id="p-destination">
+                            <option value="last">Last (Fijo)</option>
+                            <option value="any">Any (Cualquiera)</option>
+                        </select>
+                    </div>`
+            },
+            table: {
+                desc: "Calcula matrices N x M de tiempos y distancias entre todos los puntos.",
+                params: `
+                    <div class="control-group">
+                        <h4>Anotaciones</h4>
+                        <label>Annotations</label>
+                        <select id="p-annotations">
+                            <option value="duration">Solo Duración</option>
+                            <option value="distance">Solo Distancia</option>
+                            <option value="duration,distance">Ambas</option>
+                        </select>
+                    </div>`
+            },
+            match: {
+                desc: "Map Matching. Ajusta puntos GPS 'sucios' a la red vial real.",
+                params: `
+                    <div class="control-group">
+                        <h4>Opciones Matching</h4>
+                        <div class="checkbox-row"><input type="checkbox" id="p-steps"> <label>Steps (Instrucciones)</label></div>
+                        <label>Gaps (Brechas)</label>
+                        <select id="p-gaps">
+                            <option value="split">Split (Cortar si está lejos)</option>
+                            <option value="ignore">Ignore (Forzar unión)</option>
+                        </select>
+                        <label>Tidy (Limpiar ruido)</label>
+                        <select id="p-tidy">
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                        </select>
+                    </div>`
+            },
+            nearest: {
+                desc: "Encuentra el punto más cercano en la calle (Snap).",
+                params: `
+                    <div class="control-group">
+                        <h4>Opciones Nearest</h4>
+                        <label>Número de resultados</label>
+                        <input type="number" id="p-number" value="1" min="1" max="10">
+                    </div>
+                    <small style="color:orange">Nota: Solo usa el último punto clicado.</small>`
+            }
+        };
+
+        // --- INICIALIZACIÓN ---
+        function initMap() {
+            const mapEl = document.getElementById('map');
+            if (!mapEl) return; // Seguridad
+
+            map = new google.maps.Map(mapEl, {
+                zoom: 12,
+                center: { lat: 4.60971, lng: -74.08175 },
+                clickableIcons: false,
+                disableDefaultUI: true,
+                zoomControl: true
+            });
+
+            map.addListener("click", (e) => {
+                addPoint(e.latLng.lat(), e.latLng.lng());
+            });
+
+            // Cargar UI inicial
+            setService('route');
+        }
+
+        // --- LOGICA UI (CORREGIDA) ---
+        function setService(service) {
+            currentService = service;
+
+            // 1. Gestión de Tabs (Sin usar 'event' para evitar el error)
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            // Busca el botón correspondiente al servicio y actívalo
+            const activeBtn = Array.from(tabs).find(t => t.innerText.toLowerCase().includes(service.substring(0, 3)));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            // 2. Actualización de Contenido (Con validación de nulos)
+            const descEl = document.getElementById('desc-text');
+            if (descEl) descEl.innerText = servicesConfig[service].desc;
+
+            const paramsEl = document.getElementById('params-container');
+            if (paramsEl) paramsEl.innerHTML = servicesConfig[service].params;
+
+            // Limpieza específica si es necesario
+            if (service === 'nearest' && points.length > 1) {
+                // Opcional: lógica extra
+            }
+        }
+
+        function setPanelTab(tabName) {
+            const tabs = document.querySelectorAll('.panel-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            const viewSummary = document.getElementById('view-summary');
+            const viewJson = document.getElementById('view-json');
+
+            if (tabName === 'summary') {
+                if (tabs[0]) tabs[0].classList.add('active');
+                if (viewSummary) viewSummary.style.display = 'block';
+                if (viewJson) viewJson.style.display = 'none';
+            } else {
+                if (tabs[1]) tabs[1].classList.add('active');
+                if (viewSummary) viewSummary.style.display = 'none';
+                if (viewJson) viewJson.style.display = 'block';
+            }
+        }
+
+        let isPanelOpen = true;
+        function togglePanel() {
+            const panel = document.getElementById('data-panel');
+            if (!panel) return;
+
+            if (isPanelOpen) {
+                panel.style.height = '40px'; // Colapsado
+            } else {
+                panel.style.height = '250px'; // Expandido
+            }
+            isPanelOpen = !isPanelOpen;
+        }
+
+        function addPoint(lat, lng) {
+            if (currentService === 'nearest') clearAll();
+
+            const marker = new google.maps.Marker({
+                position: { lat, lng },
+                map: map,
+                label: (points.length + 1).toString()
+            });
+            points.push({ lat, lng, marker });
+            updatePointList();
+        }
+
+        function updatePointList() {
+            const list = document.getElementById('point-list');
+            const count = document.getElementById('point-count');
+
+            if (count) count.innerText = points.length;
+            if (list) {
+                list.innerHTML = "";
+                points.forEach((p, i) => {
+                    list.innerHTML += `<li>#${i + 1}: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</li>`;
+                });
+            }
+        }
+
+        function clearAll() {
+            points.forEach(p => p.marker.setMap(null));
+            points = [];
+            resultObjects.forEach(o => o.setMap ? o.setMap(null) : null);
+            resultObjects = [];
+
+            updatePointList();
+
+            const summary = document.getElementById('view-summary');
+            if (summary) summary.innerText = "Esperando datos...";
+
+            const jsonView = document.getElementById('view-json');
+            if (jsonView) jsonView.innerHTML = '<pre class="json-pre">{}</pre>';
+        }
+
+        // --- EJECUCIÓN API (CORE) ---
+        async function executeService() {
+            if (points.length === 0) { alert("Agrega puntos en el mapa primero."); return; }
+
+            const statusDiv = document.getElementById('view-summary');
+            if (statusDiv) statusDiv.innerHTML = "⏳ Consultando API...";
+
+            const coords = points.map(p => `${p.lng},${p.lat}`).join(';');
+            let url = `${API_BASE}/${currentService}/v1/driving/${coords}?`;
+
+            const params = new URLSearchParams();
+
+            if (currentService === 'route') {
+                params.append('overview', document.getElementById('p-overview').checked ? 'full' : 'simplified');
+                params.append('steps', document.getElementById('p-steps').checked);
+                if (document.getElementById('p-alternatives').checked) params.append('alternatives', 3);
+                params.append('geometries', 'polyline');
+            }
+            else if (currentService === 'trip') {
+                // LÓGICA AUTOMÁTICA PARA EVITAR ERROR "NotImplemented"
+                const isRoundtrip = document.getElementById('p-roundtrip').value;
+                if (isRoundtrip === 'false') {
+                    // Si es solo ida, forzamos source=first y dest=last
+                    params.append('roundtrip', 'false');
+                    params.append('source', 'first');
+                    params.append('destination', 'last');
+                } else {
+                    params.append('roundtrip', 'true');
+                    params.append('source', document.getElementById('p-source').value);
+                    params.append('destination', document.getElementById('p-destination').value);
+                }
+                params.append('overview', 'full');
+                params.append('geometries', 'polyline');
+            }
+            else if (currentService === 'table') {
+                params.append('annotations', document.getElementById('p-annotations').value);
+            }
+            else if (currentService === 'match') {
+                params.append('overview', 'full');
+                params.append('geometries', 'polyline');
+                params.append('steps', document.getElementById('p-steps').checked);
+                params.append('tidy', document.getElementById('p-tidy').value);
+                params.append('gaps', document.getElementById('p-gaps').value);
+            }
+            else if (currentService === 'nearest') {
+                params.append('number', document.getElementById('p-number').value);
+            }
+
+            try {
+                const fullUrl = url + params.toString();
+                console.log("Fetching:", fullUrl);
+                const response = await fetch(fullUrl);
+                const data = await response.json();
+
+                // Mostrar JSON Crudo
+                const jsonPre = document.querySelector('#view-json .json-pre');
+                if (jsonPre) jsonPre.innerText = JSON.stringify(data, null, 2);
+
+                if (data.code !== 'Ok') throw new Error(data.code + ": " + (data.message || ""));
+
+                renderResults(data);
+
+            } catch (e) {
+                if (statusDiv) statusDiv.innerHTML = `<span style="color:red; font-weight:bold">ERROR: ${e.message}</span>`;
+                console.error(e);
+            }
+        }
+
+        // --- RENDERIZADO DE RESULTADOS ---
+        function renderResults(data) {
+            // Limpiar visuales anteriores
+            resultObjects.forEach(o => o.setMap ? o.setMap(null) : null);
+            resultObjects = [];
+
+            const container = document.getElementById('view-summary');
+            if (!container) return;
+            container.innerHTML = "";
+
+            switch (currentService) {
+
+                case 'route':
+                case 'trip':
+                    const routes = data.routes || data.trips;
+                    if (!routes || routes.length === 0) { container.innerHTML = "No se encontraron rutas."; return; }
+
+                    routes.forEach((r, idx) => {
+                        const color = idx === 0 ? '#007bff' : '#999';
+                        const weight = idx === 0 ? 6 : 4;
+                        const zIndex = idx === 0 ? 10 : 1;
+
+                        drawPolyline(r.geometry, color, weight, zIndex);
+
+                        container.innerHTML += `
+                            <div style="margin-bottom:10px; border-bottom:1px solid #ccc; padding-bottom:5px;">
+                                <strong>${idx === 0 ? 'Ruta Principal' : 'Alternativa'}</strong><br>
+                                Distancia: <span class="highlight-val">${(r.distance / 1000).toFixed(2)} km</span><br>
+                                Tiempo: <span class="highlight-val">${(r.duration / 60).toFixed(1)} min</span>
+                            </div>`;
+
+                        if (r.legs && r.legs[0].steps && idx === 0) {
+                            let stepsHtml = '<ul class="step-list">';
+                            r.legs.forEach(leg => {
+                                leg.steps.forEach(step => {
+                                    if (step.maneuver.type) {
+                                        stepsHtml += `<li class="step-item"><span class="step-icon">↱</span> ${step.name || "Calle sin nombre"} (${step.distance}m)</li>`;
+                                    }
+                                });
+                            });
+                            stepsHtml += '</ul>';
+                            container.innerHTML += `<details><summary>Ver Instrucciones</summary>${stepsHtml}</details>`;
+                        }
+                    });
+
+                    if (data.waypoints && currentService === 'trip') {
+                        let orderHtml = "<strong>Orden Optimizado:</strong> ";
+                        const sorted = data.waypoints.sort((a, b) => a.trips_index - b.trips_index);
+                        orderHtml += sorted.map(wp => `#${wp.waypoint_index + 1}`).join(' ➔ ');
+                        container.innerHTML += `<div style="margin-top:10px; color:var(--success)">${orderHtml}</div>`;
+                    }
+                    break;
+
+                case 'table':
+                    let tableHtml = "<table class='matrix-table'><thead><tr><th>Dest \\ Origen</th>";
+                    data.sources.forEach((s, i) => tableHtml += `<th>P${i + 1}</th>`);
+                    tableHtml += "</tr></thead><tbody>";
+
+                    data.destinations.forEach((d, i) => {
+                        tableHtml += `<tr><td><strong>P${i + 1}</strong></td>`;
+                        data.sources.forEach((s, j) => {
+                            let cellInfo = "";
+                            if (data.durations) cellInfo += `${(data.durations[j][i] / 60).toFixed(1)}m`;
+                            if (data.distances) cellInfo += `<br><small>${(data.distances[j][i] / 1000).toFixed(2)}km</small>`;
+                            tableHtml += `<td>${cellInfo || '-'}</td>`;
+                        });
+                        tableHtml += "</tr>";
+                    });
+                    tableHtml += "</tbody></table>";
+                    container.innerHTML = tableHtml;
+                    break;
+
+                case 'match':
+                    if (data.matchings) {
+                        data.matchings.forEach(m => {
+                            drawPolyline(m.geometry, '#8e44ad', 6, 10);
+                            container.innerHTML += `<div><strong>Confianza: ${(m.confidence * 100).toFixed(1)}%</strong></div>`;
+                        });
+                    }
+                    if (data.tracepoints) {
+                        data.tracepoints.forEach(tp => {
+                            if (tp) {
+                                const snapMarker = new google.maps.Marker({
+                                    position: { lat: tp.location[1], lng: tp.location[0] },
+                                    map: map,
+                                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 4, fillColor: "#8e44ad", fillOpacity: 1, strokeColor: 'white', strokeWeight: 1 },
+                                    title: "Snapped Point"
+                                });
+                                resultObjects.push(snapMarker);
+                            }
+                        });
+                    }
+                    break;
+
+                case 'nearest':
+                    if (data.waypoints && data.waypoints.length > 0) {
+                        data.waypoints.forEach(wp => {
+                            const snapPos = { lat: wp.location[1], lng: wp.location[0] };
+                            const origPos = { lat: points[0].lat, lng: points[0].lng };
+
+                            const connLine = new google.maps.Polyline({
+                                path: [origPos, snapPos],
+                                map: map,
+                                strokeColor: '#e74c3c', strokeOpacity: 0.5, strokeWeight: 2,
+                                icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW }, offset: '100%' }]
+                            });
+                            resultObjects.push(connLine);
+
+                            const snapMarker = new google.maps.Marker({
+                                position: snapPos, map: map,
+                                title: wp.name,
+                                icon: { path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, scale: 5, fillColor: "#27ae60", fillOpacity: 1, strokeWeight: 1 }
+                            });
+                            resultObjects.push(snapMarker);
+
+                            container.innerHTML += `<div><strong>Calle:</strong> ${wp.name || "Sin nombre"} (${wp.distance.toFixed(2)}m)</div>`;
+                        });
+                    }
+                    break;
+            }
+        }
+
+        function drawPolyline(encodedGeo, color, weight, zIndex) {
+            const path = google.maps.geometry.encoding.decodePath(encodedGeo);
+            const polyline = new google.maps.Polyline({
+                path: path, geodesic: true, strokeColor: color, strokeOpacity: 0.8, strokeWeight: weight, zIndex: zIndex
+            });
+            polyline.setMap(map);
+            resultObjects.push(polyline);
+            const bounds = new google.maps.LatLngBounds();
+            path.forEach(p => bounds.extend(p));
+            map.fitBounds(bounds);
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+
+</html>

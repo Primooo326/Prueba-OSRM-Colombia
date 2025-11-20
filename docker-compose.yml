@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  # Backend: Descarga mapa, procesa y sirve la API
+  backend:
+    build: ./backend
+    container_name: osrm-api
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - osrm-data:/data
+    environment:
+      - OSRM_ALGORITHM=mld
+
+  # Frontend: Tu consola HTML
+  frontend:
+    build: ./frontend
+    container_name: osrm-web
+    restart: always
+    ports:
+      - "5500:80"
+    depends_on:
+      - backend
+
+volumes:
+  osrm-data:
