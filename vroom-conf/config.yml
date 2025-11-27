@@ -9,7 +9,7 @@ cliArgs:
   maxlocations: 1000 # max number of jobs/shipments locations
   maxvehicles: 200 # max number of vehicles
   override: ['c', 'g', 'l', 't', 'x'] # allow cli options override (c, g, l, t, and x)
-  path: './' # VROOM path (if not in $PATH)
+  path: '' # VROOM path (if not in $PATH)
   port: 3000 # expressjs port
   router: 'osrm' # routing backend (osrm, libosrm, ors, or valhalla)
   timeout: 300000 # milli-seconds
