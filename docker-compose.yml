@@ -1,17 +1,89 @@
 services:
-  # Backend: Descarga mapa, procesa y sirve la API
-  backend:
-    build: ./backend
-    container_name: osrm-api
+  # ------------------------------------------------
+  # 1. SERVICIOS DE MAPAS (OSRM)
+  # ------------------------------------------------
+  
+  # Perfil Carro (Estándar) - Puerto 5000
+  osrm-car:
+    image: osrm/osrm-backend
+    container_name: osrm-car
     restart: always
     ports:
       - "5000:5000"
     volumes:
-      - osrm-data:/data
-    environment:
-      - OSRM_ALGORITHM=mld
+      - ./osrm-data/car:/data
+    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
 
-  # Frontend: Tu consola HTML
+  # Perfil Moto - Puerto 5001
+  osrm-moto:
+    image: osrm/osrm-backend
+    container_name: osrm-moto
+    restart: always
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./osrm-data/moto:/data
+    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+
+  # Perfil Van - Puerto 5002
+  osrm-van:
+    image: osrm/osrm-backend
+    container_name: osrm-van
+    restart: always
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./osrm-data/van:/data
+    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+
+  # Perfil Camión Medio - Puerto 5003
+  osrm-medium:
+    image: osrm/osrm-backend
+    container_name: osrm-medium
+    restart: always
+    ports:
+      - "5003:5000"
+    volumes:
+      - ./osrm-data/truck_medium:/data
+    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+
+  # Perfil Camión Pesado - Puerto 5004
+  osrm-heavy:
+    image: osrm/osrm-backend
+    container_name: osrm-heavy
+    restart: always
+    ports:
+      - "5004:5000"
+    volumes:
+      - ./osrm-data/truck_heavy:/data
+    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+
+  # ------------------------------------------------
+  # 2. OPTIMIZADOR (VROOM)
+  # ------------------------------------------------
+  vroom:
+    # ESTA es la imagen correcta que incluye la API (vroom-express)
+    image: ghcr.io/vroom-project/vroom-docker:v1.14.0
+    container_name: vroom-api
+    restart: always
+    ports:
+      # El frontend espera el puerto 5200, mapeado al 3000 interno
+      - "5200:3000"
+    volumes:
+      # Montamos tu configuración arreglada
+      - ./vroom-conf:/conf
+    environment:
+      - VROOM_ROUTER=osrm
+    depends_on:
+      - osrm-car
+      - osrm-moto
+      - osrm-van
+      - osrm-medium
+      - osrm-heavy
+
+  # ------------------------------------------------
+  # 3. FRONTEND
+  # ------------------------------------------------
   frontend:
     build: ./frontend
     container_name: osrm-web
@@ -19,7 +91,4 @@ services:
     ports:
       - "5500:80"
     depends_on:
-      - backend
-
-volumes:
-  osrm-data:
+      - vroom

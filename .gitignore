@@ -1,0 +1,38 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spot
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.tmp
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated data (OSRM processed maps - large binary files)
+osrm-data/
+
+# Environment variables
+.env
+.env.local
+
+# Docker volumes (if any)
+volumes/
+data/
+data3/
+# Backup files
+*.bak
+*.backup

@@ -3,15 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>OSRM Console - Ultimate + Fix Bogotá</title>
+    <title>OSRM Multi-Perfil + VROOM Master UI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #3498db;
+            --vroom: #8e44ad;
             --light: #ecf0f1;
             --danger: #e74c3c;
             --success: #27ae60;
+            --warning: #f39c12;
         }
 
         body,
@@ -37,7 +39,7 @@
 
         /* SIDEBAR */
         #sidebar {
-            width: 350px;
+            width: 360px;
             background: #f8f9fa;
             border-right: 1px solid #ddd;
             display: flex;
@@ -94,6 +96,12 @@
             font-weight: bold;
         }
 
+        .tab-btn.vroom-active {
+            background: var(--vroom) !important;
+            border-color: var(--vroom) !important;
+            color: white;
+        }
+
         /* CONTROLES */
         .control-group {
             margin-bottom: 15px;
@@ -122,7 +130,8 @@
         }
 
         select,
-        input[type="number"] {
+        input[type="number"],
+        input[type="text"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -130,27 +139,14 @@
             font-size: 0.9rem;
             background: #fff;
             margin-bottom: 8px;
+            box-sizing: border-box;
         }
 
-        select:disabled {
-            background: #eee;
-            color: #999;
-        }
-
-        .checkbox-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .checkbox-row input {
-            margin-right: 10px;
-            transform: scale(1.2);
-        }
-
-        .checkbox-row label {
-            margin: 0;
-            font-weight: normal;
+        .vehicle-select {
+            border: 2px solid var(--accent);
+            background-color: #f0f8ff;
+            font-weight: bold;
+            color: var(--primary);
         }
 
         /* LISTA DE PUNTOS */
@@ -163,13 +159,39 @@
         }
 
         #point-list li {
-            padding: 4px 0;
+            padding: 6px 0;
             border-bottom: 1px solid #eee;
             display: flex;
+            align-items: center;
             justify-content: space-between;
         }
 
-        /* BOTONES */
+        .point-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+
+        .btn-del {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+
+        /* BOTONES PRINCIPALES */
         .btn-action {
             width: 100%;
             padding: 12px;
@@ -188,22 +210,25 @@
             background: #219150;
         }
 
+        .btn-vroom {
+            background: var(--vroom);
+        }
+
+        .btn-vroom:hover {
+            background: #7d3c98;
+        }
+
         .btn-clear {
             background: var(--danger);
             margin-top: 8px;
         }
 
-        .btn-clear:hover {
-            background: #c0392b;
-        }
-
-        /* MAPA */
+        /* MAPA & PANEL */
         #map {
             flex: 1;
             background: #eee;
         }
 
-        /* PANEL INFERIOR */
         #data-panel {
             height: 250px;
             background: white;
@@ -243,7 +268,6 @@
             font-size: 0.9rem;
         }
 
-        /* VISUALIZACIÓN JSON/TABLA */
         .json-pre {
             white-space: pre-wrap;
             color: #2c3e50;
@@ -262,45 +286,51 @@
             text-align: center;
         }
 
-        .matrix-table th {
-            background: #f9f9f9;
+        /* MODAL */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
 
-        .highlight-val {
-            color: var(--accent);
+        #modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #modal-header {
             font-weight: bold;
-        }
-
-        /* Steps */
-        .step-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .step-item {
-            padding: 8px 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--primary);
             border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-footer {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .half-row {
             display: flex;
             gap: 10px;
-            align-items: center;
-        }
-
-        .step-icon {
-            font-weight: bold;
-            color: white;
-            background: var(--accent);
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 12px;
         }
     </style>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=geometry"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdY17gpwgszK7sKVQRlsuDCvM4XNQEmrU&libraries=geometry"></script>
 </head>
 
 <body>
@@ -309,21 +339,49 @@
         <div id="main-area">
             <aside id="sidebar">
                 <div id="sidebar-header">
-                    <h2>OSRM Console</h2>
-                    <small id="api-status">Conectando a localhost:5000...</small>
+                    <h2>OSRM & VROOM</h2>
+                    <small>Master API UI (Port 3000)</small>
                 </div>
                 <div id="sidebar-content">
 
-                    <div class="service-tabs">
-                        <div class="tab-btn active" onclick="setService('route')">Route</div>
-                        <div class="tab-btn" onclick="setService('trip')">Trip (TSP)</div>
-                        <div class="tab-btn" onclick="setService('table')">Table</div>
-                        <div class="tab-btn" onclick="setService('match')">Match</div>
-                        <div class="tab-btn" onclick="setService('nearest')">Nearest</div>
+                    <div class="control-group" style="border-left: 4px solid var(--accent);">
+                        <h4>1. Flota (Vehículo Principal)</h4>
+                        <select id="vehicle-profile" class="vehicle-select" onchange="onProfileChange()">
+                            <option value="car">🚗 Carro (osrm-car)</option>
+                            <option value="moto">🏍️ Moto (osrm-moto)</option>
+                            <option value="van">🚐 Van (osrm-van)</option>
+                            <option value="truck_medium">🚚 Camión Medio</option>
+                            <option value="truck_heavy">🚛 Camión Pesado</option>
+                        </select>
+
+                        <div id="vroom-vehicle-config"
+                            style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
+                            <div class="half-row">
+                                <div><label>Capacidad</label><input type="number" id="v-capacity" value="100"></div>
+                                <div><label>Skills (ej: 1,2)</label><input type="text" id="v-skills" placeholder="1, 2">
+                                </div>
+                            </div>
+                            <div class="half-row">
+                                <div><label>Inicio Turno (s)</label><input type="number" id="v-start-time" value="0">
+                                </div>
+                                <div><label>Fin Turno (s)</label><input type="number" id="v-end-time" value="28800">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.75rem; color:#666; margin-top:5px">
+                            <span id="vroom-port-display">VROOM Port: 3000</span>
+                        </div>
                     </div>
 
-                    <p id="desc-text"
-                        style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px; min-height: 30px;">
+                    <div class="service-tabs">
+                        <div class="tab-btn active" onclick="setService('route')">Ruta</div>
+                        <div class="tab-btn" onclick="setService('trip')">TSP</div>
+                        <div class="tab-btn" onclick="setService('vroom')">VROOM</div>
+                        <div class="tab-btn" onclick="setService('table')">Matriz</div>
+                    </div>
+
+                    <p id="desc-text" style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px;">
                         Ruta punto a punto estándar.
                     </p>
 
@@ -332,12 +390,12 @@
                     <div class="control-group">
                         <h4>Puntos (<span id="point-count">0</span>)</h4>
                         <ul id="point-list">
-                            <li style="font-style:italic; color:#999;">Haz clic en el mapa para agregar...</li>
+                            <li style="font-style:italic; color:#999;">Haz clic en el mapa...</li>
                         </ul>
                     </div>
 
-                    <button class="btn-action" onclick="executeService()">EJECUTAR CONSULTA</button>
-                    <button class="btn-action btn-clear" onclick="clearAll()">LIMPIAR TODO</button>
+                    <button id="btn-execute" class="btn-action" onclick="executeService()">CALCULAR</button>
+                    <button class="btn-action btn-clear" onclick="clearAll()">LIMPIAR</button>
                 </div>
             </aside>
 
@@ -346,10 +404,9 @@
 
         <div id="data-panel">
             <div class="panel-tabs">
-                <div class="panel-tab active" onclick="setPanelTab('summary')">Resumen Visual</div>
-                <div class="panel-tab" onclick="setPanelTab('json')">JSON Crudo (API)</div>
-                <div class="panel-tab" onclick="togglePanel()"
-                    style="margin-left: auto; font-size: 1.2rem; padding: 5px 15px;">↕</div>
+                <div class="panel-tab active" onclick="setPanelTab('summary')">Resumen</div>
+                <div class="panel-tab" onclick="setPanelTab('json')">JSON</div>
+                <div class="panel-tab" onclick="togglePanel()" style="margin-left: auto;">↕</div>
             </div>
             <div id="panel-content-area" class="panel-content">
                 <div id="view-summary">Esperando datos...</div>
@@ -360,423 +417,392 @@
         </div>
     </div>
 
-    <script>
-        // --- CONFIGURACIÓN ---
-        const API_BASE = "http://localhost:5000";
+    <div id="modal-overlay">
+        <div id="modal-content">
+            <div id="modal-header">Editar Trabajo / Punto</div>
+            <input type="hidden" id="edit-id">
 
-        // --- ESTADO GLOBAL ---
-        let currentService = 'route';
-        let map;
-        let points = []; // {lat, lng, marker}
-        let resultObjects = []; // Polylines, markers, etc.
-        let isPanelOpen = true;
+            <label>Demanda / Entrega</label>
+            <input type="number" id="edit-delivery" value="10">
 
-        // --- DEFINICIÓN DE SERVICIOS Y UI ---
-        const servicesConfig = {
-            route: {
-                desc: "Ruta directa entre puntos (Orden Fijo).",
-                params: `
-            <div class="control-group">
-                <h4>Opciones de Ruta</h4>
-                <div class="checkbox-row"><input type="checkbox" id="p-steps" checked> <label>Steps (Instrucciones)</label></div>
-                <div class="checkbox-row"><input type="checkbox" id="p-overview" checked> <label>Overview (Geometría)</label></div>
-                <div class="checkbox-row"><input type="checkbox" id="p-alternatives"> <label>Alternativas</label></div>
-            </div>`
-            },
-            trip: {
-                desc: "Optimización TSP. Reordena para la ruta más eficiente.",
-                params: `
-            <div class="control-group">
-                <h4>Estrategia TSP</h4>
-                <label>1. Tipo de Viaje</label>
-                <select id="p-roundtrip" onchange="updateTripOptions()">
-                    <option value="true">Circular (Optimización Libre)</option>
-                    <option value="false">Lineal Estricto (A -> Z)</option>
-                </select>
-                <div id="trip-extra-opts">
-                    <label>2. Inicio</label>
-                    <select id="p-source">
-                        <option value="first">Fijo (Primer Click)</option>
-                        <option value="any">Cualquiera</option>
-                    </select>
-                    <label>3. Destino</label>
-                    <select id="p-destination">
-                        <option value="any" selected>Cualquiera (Recomendado)</option>
-                        <option value="last">Fijo (Último Click)</option>
-                    </select>
+            <label>Tiempo Servicio (segundos)</label>
+            <input type="number" id="edit-service" value="300">
+
+            <div class="half-row">
+                <div>
+                    <label>Ventana Inicio</label>
+                    <input type="number" id="edit-tw-start" placeholder="0">
                 </div>
-                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
-                   <small style="color:#e67e22;">* Usa "Circular + Destino Cualquiera" para corregir el zig-zag.</small>
+                <div>
+                    <label>Ventana Fin</label>
+                    <input type="number" id="edit-tw-end" placeholder="86400">
                 </div>
-            </div>`
-            },
-            table: {
-                desc: "Matriz de tiempos todos contra todos (N x M).",
-                params: `
-            <div class="control-group">
-                <h4>Opciones Tabla</h4>
-                <label>Resultados</label>
-                <select id="p-annotations">
-                    <option value="duration">Solo Duración</option>
-                    <option value="distance">Solo Distancia</option>
-                    <option value="duration,distance">Ambas</option>
-                </select>
-            </div>`
-            },
-            match: {
-                desc: "Map Matching. Ajusta GPS impreciso a la calle.",
-                params: `
-            <div class="control-group">
-                <h4>Opciones Match</h4>
-                <div class="checkbox-row"><input type="checkbox" id="p-steps"> <label>Instrucciones</label></div>
-                <label>Gaps (Brechas)</label>
-                <select id="p-gaps"><option value="split">Split</option><option value="ignore">Ignore</option></select>
-                <label>Tidy (Limpiar)</label>
-                <select id="p-tidy"><option value="true">True</option><option value="false">False</option></select>
-            </div>`
-            },
-            nearest: {
-                desc: "Encuentra el punto de la calle más cercano (Snap).",
-                params: `
-            <div class="control-group">
-                <h4>Opciones Nearest</h4>
-                <label>Cantidad</label>
-                <input type="number" id="p-number" value="1" min="1" max="5">
             </div>
-            <small>Usa solo el último punto.</small>`
-            }
+
+            <div class="half-row">
+                <div>
+                    <label>Prioridad (0-100)</label>
+                    <input type="number" id="edit-priority" value="50">
+                </div>
+                <div>
+                    <label>Skills Req.</label>
+                    <input type="text" id="edit-skills" placeholder="ej: 1">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closeModal()"
+                    style="padding:8px; border:none; background:#ccc; cursor:pointer; border-radius:4px;">Cancelar</button>
+                <button onclick="savePointData()"
+                    style="padding:8px; border:none; background:var(--accent); color:white; cursor:pointer; border-radius:4px;">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_VROOM = "http://localhost:3000";
+        const HOST = "http://localhost";
+
+        const PROFILES = {
+            car: { directPort: 5000, vroomProfile: "car" },
+            moto: { directPort: 5001, vroomProfile: "moto" },
+            van: { directPort: 5002, vroomProfile: "van" },
+            truck_medium: { directPort: 5003, vroomProfile: "truck_medium" },
+            truck_heavy: { directPort: 5004, vroomProfile: "truck_heavy" }
         };
 
-        // --- INICIALIZACIÓN ---
+        // --- ESTADO ---
+        let currentService = 'route';
+        let currentProfileKey = 'car';
+        let map;
+        let points = [];
+        let resultObjects = [];
+        let isPanelOpen = true;
+
+        const servicesConfig = {
+            route: { desc: "Ruta A -> B (Orden fijo)", params: `<div class="checkbox-row"><input type="checkbox" id="p-steps" checked> Steps</div>` },
+            trip: { desc: "TSP (Viajero Comerciante)", params: `<select id="p-roundtrip"><option value="true">Circular</option><option value="false">Lineal</option></select>` },
+            vroom: { desc: "Optimización VROOM (Time Windows, Skills)", params: `` }, // Params moved to sidebar top
+            table: { desc: "Matriz NxM", params: `<select id="p-annotations"><option value="duration">Duración</option></select>` }
+        };
+
         function initMap() {
             const mapEl = document.getElementById('map');
             if (!mapEl) return;
-
-            map = new google.maps.Map(mapEl, {
-                zoom: 13,
-                center: { lat: 4.62, lng: -74.10 }, // Centro geográfico aprox
-                clickableIcons: false,
-                disableDefaultUI: true,
-                zoomControl: true
-            });
-
-            map.addListener("click", (e) => {
-                addPoint(e.latLng.lat(), e.latLng.lng());
-            });
-
+            map = new google.maps.Map(mapEl, { zoom: 13, center: { lat: 4.62, lng: -74.10 }, disableDefaultUI: true, zoomControl: true });
+            map.addListener("click", (e) => addPoint(e.latLng.lat(), e.latLng.lng()));
             setService('route');
+            onProfileChange();
         }
 
-        // --- LÓGICA UI ---
+        function onProfileChange() {
+            const select = document.getElementById('vehicle-profile');
+            currentProfileKey = select.value;
+            const config = PROFILES[currentProfileKey];
+            document.getElementById('vroom-port-display').innerText = `VROOM: ${config.vroomProfile} | Direct: ${config.directPort}`;
+        }
+
         function setService(service) {
             currentService = service;
-
-            // Tabs
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            const tabs = Array.from(document.querySelectorAll('.tab-btn'));
-            const active = tabs.find(t => t.innerText.toLowerCase().includes(service.substr(0, 3)));
-            if (active) active.classList.add('active');
-
-            // Params
-            const desc = document.getElementById('desc-text');
-            if (desc) desc.innerText = servicesConfig[service].desc;
-
-            const container = document.getElementById('params-container');
-            if (container) {
-                container.innerHTML = servicesConfig[service].params;
-                if (service === 'trip') updateTripOptions();
-            }
-
-            if (service === 'nearest' && points.length > 1) clearAll();
-        }
-
-        // Validaciones Lógicas de OSRM para Trip
-        window.updateTripOptions = function () {
-            const isRound = document.getElementById('p-roundtrip').value === 'true';
-            const src = document.getElementById('p-source');
-            const dst = document.getElementById('p-destination');
-
-            if (!isRound) {
-                // OSRM Regla: Si roundtrip=false, source debe ser first y destination last
-                src.value = 'first'; src.disabled = true;
-                dst.value = 'last'; dst.disabled = true;
-            } else {
-                src.disabled = false;
-                dst.disabled = false;
-            }
+            // UI Update
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active', 'vroom-active');
+                if (b.innerText.toLowerCase().includes(service.substr(0, 3))) {
+                    if (service === 'vroom') {
+                        b.classList.add('vroom-active');
+                        document.getElementById('btn-execute').classList.add('btn-vroom');
+                        document.getElementById('vroom-vehicle-config').style.display = 'block';
+                    } else {
+                        b.classList.add('active');
+                        document.getElementById('btn-execute').classList.remove('btn-vroom');
+                        document.getElementById('vroom-vehicle-config').style.display = 'none';
+                    }
+                }
+            });
+            document.getElementById('desc-text').innerText = servicesConfig[service].desc;
+            document.getElementById('params-container').innerHTML = servicesConfig[service].params || "";
+            updatePointList();
         }
 
         function addPoint(lat, lng) {
-            if (currentService === 'nearest') clearAll();
+            let label = (points.length + 1).toString();
+            // Default Data Object for Advanced VROOM features
+            const pointData = {
+                lat, lng,
+                marker: null,
+                delivery: 10,
+                service: 300,
+                twStart: null,
+                twEnd: null,
+                priority: 50,
+                skills: ""
+            };
+
+            if (currentService === 'vroom' && points.length === 0) label = "D"; // Depot
 
             const marker = new google.maps.Marker({
-                position: { lat, lng },
-                map: map,
-                label: { text: (points.length + 1).toString(), color: "white" },
-                title: `Punto ${points.length + 1}`
+                position: { lat, lng }, map: map,
+                label: { text: label, color: "white" },
+                title: `Punto`
             });
 
-            points.push({ lat, lng, marker });
+            pointData.marker = marker;
+            points.push(pointData);
             updatePointList();
         }
 
         function updatePointList() {
             const list = document.getElementById('point-list');
-            const count = document.getElementById('point-count');
-            if (count) count.innerText = points.length;
+            document.getElementById('point-count').innerText = points.length;
+            list.innerHTML = "";
 
-            if (list) {
-                list.innerHTML = "";
-                if (points.length === 0) list.innerHTML = "<li style='color:#999'>Clic en el mapa...</li>";
+            points.forEach((p, i) => {
+                let role = `P${i + 1}`;
+                let isDepot = false;
+                if (currentService === 'vroom' && i === 0) {
+                    role = "🏢 Depósito";
+                    isDepot = true;
+                } else if (currentService === 'vroom') {
+                    role = `📦 Job ${i}`;
+                }
 
-                points.forEach((p, i) => {
-                    list.innerHTML += `<li><strong>P${i + 1}</strong> <span>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span></li>`;
-                });
-            }
+                let html = `<li>
+                    <div>
+                        <strong>${role}</strong><br>
+                        <small style="color:#888">${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}</small>
+                    </div>`;
+
+                // Botón editar solo para Jobs (no Depósito en v1)
+                if (!isDepot && currentService === 'vroom') {
+                    html += `<div class="point-actions">
+                                <button class="btn-edit" onclick="openModal(${i})">⚙️</button>
+                                <button class="btn-del" onclick="removePoint(${i})">✖</button>
+                             </div>`;
+                } else if (!isDepot) {
+                    html += `<div class="point-actions"><button class="btn-del" onclick="removePoint(${i})">✖</button></div>`;
+                }
+
+                html += `</li>`;
+                list.innerHTML += html;
+            });
+        }
+
+        function removePoint(index) {
+            points[index].marker.setMap(null);
+            points.splice(index, 1);
+            // Re-label markers
+            points.forEach((p, i) => {
+                let label = (i + 1).toString();
+                if (currentService === 'vroom') label = i === 0 ? "D" : i.toString();
+                p.marker.setLabel({ text: label, color: "white" });
+            });
+            updatePointList();
         }
 
         function clearAll() {
             points.forEach(p => p.marker.setMap(null));
-            points = [];
             resultObjects.forEach(o => o.setMap(null));
-            resultObjects = [];
+            points = []; resultObjects = [];
             updatePointList();
             document.getElementById('view-summary').innerText = "Esperando datos...";
-            document.getElementById('view-json').innerHTML = "<pre class='json-pre'>{}</pre>";
+            document.getElementById('view-json').style.display = 'none';
         }
 
-        function setPanelTab(mode) {
-            const tabs = document.querySelectorAll('.panel-tab');
-            tabs.forEach(t => t.classList.remove('active'));
+        // --- MODAL LOGIC ---
+        function openModal(index) {
+            const p = points[index];
+            document.getElementById('edit-id').value = index;
+            document.getElementById('edit-delivery').value = p.delivery;
+            document.getElementById('edit-service').value = p.service;
+            document.getElementById('edit-tw-start').value = p.twStart;
+            document.getElementById('edit-tw-end').value = p.twEnd;
+            document.getElementById('edit-priority').value = p.priority;
+            document.getElementById('edit-skills').value = p.skills;
 
-            const summary = document.getElementById('view-summary');
-            const json = document.getElementById('view-json');
-
-            if (mode === 'summary') {
-                tabs[0].classList.add('active');
-                summary.style.display = 'block';
-                json.style.display = 'none';
-            } else {
-                tabs[1].classList.add('active');
-                summary.style.display = 'none';
-                json.style.display = 'block';
-            }
+            document.getElementById('modal-overlay').style.display = 'flex';
         }
 
-        function togglePanel() {
-            const p = document.getElementById('data-panel');
-            if (isPanelOpen) p.style.height = '45px';
-            else p.style.height = '250px';
-            isPanelOpen = !isPanelOpen;
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
         }
 
-        // --- EJECUCIÓN DE LA API (VERSIÓN ROBUSTA) ---
+        function savePointData() {
+            const index = parseInt(document.getElementById('edit-id').value);
+            const p = points[index];
+
+            p.delivery = parseInt(document.getElementById('edit-delivery').value) || 0;
+            p.service = parseInt(document.getElementById('edit-service').value) || 0;
+            p.twStart = document.getElementById('edit-tw-start').value ? parseInt(document.getElementById('edit-tw-start').value) : null;
+            p.twEnd = document.getElementById('edit-tw-end').value ? parseInt(document.getElementById('edit-tw-end').value) : null;
+            p.priority = parseInt(document.getElementById('edit-priority').value) || 50;
+            p.skills = document.getElementById('edit-skills').value;
+
+            closeModal();
+            // Visual feedback could be added here
+            alert(`Job ${index} actualizado.`);
+        }
+
+        // --- API EXECUTION ---
         async function executeService() {
-            if (points.length < 2 && currentService !== 'nearest') { alert("Agrega al menos 2 puntos."); return; }
-
+            if (points.length < 2) { alert("Mínimo 2 puntos."); return; }
             const statusDiv = document.getElementById('view-summary');
-            statusDiv.innerHTML = "⏳ Consultando API Docker...";
+            statusDiv.innerHTML = "⏳ Enviando a API Master...";
 
-            // 1. Base URL (Sin Query Params ni signos de interrogación)
-            const coords = points.map(p => `${p.lng},${p.lat}`).join(';');
-            const baseUrl = `${API_BASE}/${currentService}/v1/driving/${coords}`;
-
-            // 2. Gestor de Parámetros (Se encarga de los ? y & automáticamente)
-            const params = new URLSearchParams();
-
-            // --- Parámetros Globales ---
-            if (currentService !== 'table' && currentService !== 'nearest') {
-                params.append('overview', document.getElementById('p-overview') && document.getElementById('p-overview').checked ? 'full' : 'full');
-                params.append('geometries', 'polyline');
-            }
-
-            // --- Fix Bogotá (Approaches) ---
-            if (currentService === 'route' || currentService === 'trip') {
-                const approaches = points.map(() => 'curb').join(';');
-                params.append('approaches', approaches);
-            }
-
-            // --- Parámetros Específicos ---
-            if (currentService === 'route') {
-                params.append('steps', document.getElementById('p-steps').checked);
-                if (document.getElementById('p-alternatives').checked) params.append('alternatives', 3);
-            }
-            else if (currentService === 'trip') {
-                params.append('roundtrip', document.getElementById('p-roundtrip').value);
-                params.append('source', document.getElementById('p-source').value);
-                params.append('destination', document.getElementById('p-destination').value);
-                params.append('steps', 'true');
-                params.append('annotations', 'duration,distance');
-            }
-            else if (currentService === 'table') {
-                params.append('annotations', document.getElementById('p-annotations').value);
-            }
-            else if (currentService === 'match') {
-                params.append('steps', document.getElementById('p-steps').checked);
-                params.append('tidy', document.getElementById('p-tidy').value);
-                params.append('gaps', document.getElementById('p-gaps').value);
-                const radiuses = points.map(() => '50').join(';');
-                params.append('radiuses', radiuses);
-            }
-            else if (currentService === 'nearest') {
-                params.append('number', document.getElementById('p-number').value);
-            }
+            const profileConfig = PROFILES[currentProfileKey];
+            let url = "", method = "GET", body = null;
 
             try {
-                // 3. Construcción Final Automática
-                const finalUrl = `${baseUrl}?${params.toString()}`;
+                if (currentService === 'vroom') {
+                    url = API_VROOM + "/";
+                    method = "POST";
+                    const depot = points[0];
 
-                console.log("Request:", finalUrl);
-                const res = await fetch(finalUrl);
+                    // Vehicle Config
+                    const vCap = parseInt(document.getElementById('v-capacity').value);
+                    const vSkillsStr = document.getElementById('v-skills').value;
+                    const vSkills = vSkillsStr ? vSkillsStr.split(',').map(Number) : undefined;
+                    const vStartT = parseInt(document.getElementById('v-start-time').value);
+                    const vEndT = parseInt(document.getElementById('v-end-time').value);
+
+                    const payload = {
+                        vehicles: [{
+                            id: 1,
+                            profile: profileConfig.vroomProfile,
+                            start: [depot.lng, depot.lat],
+                            end: [depot.lng, depot.lat],
+                            capacity: [vCap],
+                            skills: vSkills,
+                            time_window: [vStartT, vEndT]
+                        }],
+                        jobs: points.slice(1).map((p, idx) => {
+                            const job = {
+                                id: idx + 1,
+                                location: [p.lng, p.lat],
+                                delivery: [p.delivery],
+                                service: p.service,
+                                priority: p.priority
+                            };
+                            // Add optional fields only if set
+                            if (p.twStart !== null && p.twEnd !== null) {
+                                job.time_windows = [[p.twStart, p.twEnd]];
+                            }
+                            if (p.skills) {
+                                job.skills = p.skills.split(',').map(Number);
+                            }
+                            return job;
+                        }),
+                        options: { g: true }
+                    };
+                    body = JSON.stringify(payload);
+                }
+                else {
+                    // OSRM STANDARD LOGIC
+                    const port = profileConfig.directPort;
+                    const coords = points.map(p => `${p.lng},${p.lat}`).join(';');
+                    url = `${HOST}:${port}/${currentService}/v1/driving/${coords}?overview=full&geometries=polyline`;
+                    if (currentService === 'trip') url += `&roundtrip=${document.getElementById('p-roundtrip').value}`;
+                    if (currentService === 'table') url += `&annotations=duration`;
+                }
+
+                console.log("Payload:", body);
+
+                const res = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : undefined, body });
                 const data = await res.json();
 
                 document.querySelector('#view-json .json-pre').innerText = JSON.stringify(data, null, 2);
-
-                if (data.code !== 'Ok') {
-                    if (data.code === 'NoSegment') throw new Error("Punto lejos de la vía (NoSegment).");
-                    throw new Error(`API Error: ${data.code} - ${data.message || ''}`);
-                }
-
                 renderResults(data);
 
             } catch (e) {
-                statusDiv.innerHTML = `<div style="color:red; font-weight:bold">Error: ${e.message}</div>`;
+                statusDiv.innerHTML = `<div style="color:red;">Error: ${e.message}</div>`;
                 console.error(e);
             }
         }
 
-        // --- RENDERIZADO DE RESULTADOS ---
         function renderResults(data) {
-            // Clear
             resultObjects.forEach(o => o.setMap(null));
             resultObjects = [];
-
             const container = document.getElementById('view-summary');
             container.innerHTML = "";
 
-            // 1. ROUTE & TRIP
-            if (currentService === 'route' || currentService === 'trip') {
-                const routes = data.routes || data.trips;
-                if (!routes || routes.length === 0) { container.innerHTML = "Sin resultados."; return; }
+            if (currentService === 'vroom') {
+                if (data.routes && data.routes.length > 0) {
+                    let html = `<h4>VROOM Result</h4>`;
 
-                // Visualización del Orden TSP
-                if (currentService === 'trip' && data.waypoints) {
-                    const sorted = data.waypoints.sort((a, b) => a.trips_index - b.trips_index);
+                    // Iterar sobre TODAS las rutas (si VROOM usa múltiples vehículos)
+                    const colors = ['#8e44ad', '#e67e22', '#2980b9', '#c0392b'];
 
-                    let html = `<div style="background:#e8f5e9; padding:10px; border-radius:5px; margin-bottom:10px;">`;
-                    html += `<strong style="color:#27ae60">🏁 Orden Optimizado:</strong><br>`;
+                    data.routes.forEach((r, idx) => {
+                        const color = colors[idx % colors.length];
+                        if (r.geometry) drawPolyline(r.geometry, color);
 
-                    // Lógica visual para simplificar la lectura
-                    html += sorted.map(wp => {
-                        const idx = wp.waypoint_index + 1;
-                        return `<span style="background:white; border:1px solid #ccc; padding:2px 6px; border-radius:4px; font-weight:bold;">P${idx}</span>`;
-                    }).join(' ➔ ');
-                    html += `</div>`;
-                    container.innerHTML += html;
-                }
+                        html += `<div style="border-left:3px solid ${color}; padding-left:5px; margin-bottom:10px;">
+                                    <strong>Vehículo ${r.vehicle}</strong><br>
+                                    Dist: ${(r.distance / 1000).toFixed(1)}km | Dur: ${(r.duration / 60).toFixed(0)}min
+                                    <ul style="font-size:0.8rem; padding-left:15px; margin:5px 0;">`;
 
-                routes.forEach((r, idx) => {
-                    const color = idx === 0 ? '#3498db' : '#95a5a6';
-                    const zIndex = idx === 0 ? 10 : 5;
-
-                    drawPolyline(r.geometry, color);
-
-                    let info = `<div style="border-bottom:1px solid #eee; padding:8px 0;">`;
-                    info += `<strong>${currentService === 'trip' ? 'Viaje Optimizado' : (idx === 0 ? 'Ruta Principal' : 'Alternativa')}</strong><br>`;
-                    info += `Dist: <span class="highlight-val">${(r.distance / 1000).toFixed(2)} km</span> | `;
-                    info += `Tiempo: <span class="highlight-val">${(r.duration / 60).toFixed(1)} min</span>`;
-
-                    // Steps (Collapsible)
-                    if (r.legs && r.legs[0].steps && idx === 0) {
-                        let stepsHtml = `<ul class="step-list">`;
-                        r.legs.forEach((leg, lIdx) => {
-                            stepsHtml += `<li style="background:#eee; padding:4px; font-size:0.8rem;">Tramo ${lIdx + 1}</li>`;
-                            leg.steps.forEach(s => {
-                                if (s.maneuver && s.maneuver.type) {
-                                    let icon = "↱";
-                                    if (s.maneuver.type.includes("left")) icon = "↰";
-                                    if (s.maneuver.type.includes("right")) icon = "↱";
-                                    if (s.maneuver.type === "arrive") icon = "🏁";
-
-                                    stepsHtml += `<li class="step-item"><span class="step-icon">${icon}</span> <span>${s.name || "Calle"} <small>(${s.distance}m)</small></span></li>`;
-                                }
-                            });
+                        r.steps.forEach((s) => {
+                            if (s.type === 'job') html += `<li>Job ${s.job} (Arrive: ${formatTime(s.arrival)})</li>`;
+                            else html += `<li>${s.type}</li>`;
                         });
-                        stepsHtml += `</ul>`;
-                        info += `<details style="margin-top:5px;"><summary style="cursor:pointer; color:#3498db;">Ver Instrucciones</summary>${stepsHtml}</details>`;
+                        html += `</ul></div>`;
+                    });
+
+                    if (data.unassigned && data.unassigned.length > 0) {
+                        html += `<div style="color:red; font-weight:bold; margin-top:10px;">
+                                    ⚠️ Sin asignar: ${data.unassigned.length} trabajos
+                                 </div>`;
+                        data.unassigned.forEach(u => {
+                            html += `<small>Job ${u.id}: Capacity/Skill issue?</small><br>`;
+                        });
                     }
-                    info += `</div>`;
-                    container.innerHTML += info;
-                });
-            }
-
-            // 2. TABLE
-            else if (currentService === 'table') {
-                let html = `<table class="matrix-table"><thead><tr><th>Dest\\Orig</th>`;
-                data.sources.forEach((s, i) => html += `<th>P${i + 1}</th>`);
-                html += `</tr></thead><tbody>`;
-
-                data.destinations.forEach((d, rowIdx) => {
-                    html += `<tr><td><strong>P${rowIdx + 1}</strong></td>`;
-                    data.sources.forEach((s, colIdx) => {
-                        let val = "";
-                        if (data.durations) val += `${(data.durations[colIdx][rowIdx] / 60).toFixed(0)}m `;
-                        if (data.distances) val += `<small>(${(data.distances[colIdx][rowIdx] / 1000).toFixed(1)}km)</small>`;
-                        html += `<td>${val || '-'}</td>`;
-                    });
-                    html += `</tr>`;
-                });
-                html += `</tbody></table>`;
-                container.innerHTML = html;
-            }
-
-            // 3. MATCH & NEAREST
-            else if (currentService === 'match' || currentService === 'nearest') {
-
-                if (data.matchings) {
-                    data.matchings.forEach(m => {
-                        drawPolyline(m.geometry, '#9b59b6');
-                        container.innerHTML += `<div><strong>Confianza: ${(m.confidence * 100).toFixed(0)}%</strong></div>`;
-                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = "No solution found.";
                 }
-
-                if (data.tracepoints || data.waypoints) {
-                    const pts = data.tracepoints || data.waypoints;
-                    pts.forEach(pt => {
-                        if (!pt) return;
-                        const pos = { lat: pt.location[1], lng: pt.location[0] };
-
-                        // Draw snap marker
-                        const m = new google.maps.Marker({
-                            position: pos, map: map,
-                            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 4, fillColor: "#9b59b6", strokeColor: "white", strokeWeight: 1, fillOpacity: 1 }
-                        });
-                        resultObjects.push(m);
-
-                        // Draw connection line (for nearest)
-                        if (currentService === 'nearest' && points[0]) {
-                            const line = new google.maps.Polyline({
-                                path: [{ lat: points[0].lat, lng: points[0].lng }, pos],
-                                map: map, strokeColor: '#e74c3c', strokeOpacity: 0.5
-                            });
-                            resultObjects.push(line);
-                            container.innerHTML += `<div>Calle: <strong>${pt.name}</strong> (${pt.distance.toFixed(1)}m)</div>`;
-                        }
+            } else {
+                // Logic OSRM Standard (igual que antes)
+                if (data.routes || data.trips) {
+                    const routes = data.routes || data.trips;
+                    routes.forEach((r, i) => {
+                        if (r.geometry) drawPolyline(r.geometry, '#3498db');
+                        container.innerHTML += `<div>Ruta: ${(r.distance / 1000).toFixed(2)}km</div>`;
                     });
                 }
             }
         }
 
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            return `${h}:${m.toString().padStart(2, '0')}`;
+        }
+
         function drawPolyline(encoded, color) {
             const path = google.maps.geometry.encoding.decodePath(encoded);
-            const poly = new google.maps.Polyline({
-                path: path, geodesic: true, strokeColor: color, strokeOpacity: 0.8, strokeWeight: 5, map: map
-            });
+            const poly = new google.maps.Polyline({ path, strokeColor: color, strokeWeight: 5, map });
             resultObjects.push(poly);
-
             const bounds = new google.maps.LatLngBounds();
             path.forEach(p => bounds.extend(p));
             map.fitBounds(bounds);
+        }
+
+        function setPanelTab(t) {
+            // (Igual que antes)
+            document.querySelectorAll('.panel-tab').forEach(x => x.classList.remove('active'));
+            if (t === 'summary') {
+                document.getElementById('view-summary').style.display = 'block';
+                document.getElementById('view-json').style.display = 'none';
+                document.querySelectorAll('.panel-tab')[0].classList.add('active');
+            } else {
+                document.getElementById('view-summary').style.display = 'none';
+                document.getElementById('view-json').style.display = 'block';
+                document.querySelectorAll('.panel-tab')[1].classList.add('active');
+            }
+        }
+        function togglePanel() {
+            const p = document.getElementById('data-panel');
+            p.style.height = isPanelOpen ? '45px' : '250px';
+            isPanelOpen = !isPanelOpen;
         }
 
         window.onload = initMap;
