@@ -2,7 +2,7 @@ services:
   # ------------------------------------------------
   # 1. SERVICIOS DE MAPAS (OSRM)
   # ------------------------------------------------
-  
+
   # Perfil Carro (Estándar) - Puerto 5000
   osrm-car:
     image: osrm/osrm-backend
@@ -12,7 +12,7 @@ services:
       - "5000:5000"
     volumes:
       - ./osrm-data/car:/data
-    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+    command: osrm-routed --algorithm mld --max-table-size 10000 /data/colombia-latest.osrm
 
   # Perfil Moto - Puerto 5001
   osrm-moto:
@@ -23,7 +23,7 @@ services:
       - "5001:5000"
     volumes:
       - ./osrm-data/moto:/data
-    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+    command: osrm-routed --algorithm mld --max-table-size 10000 /data/colombia-latest.osrm
 
   # Perfil Van - Puerto 5002
   osrm-van:
@@ -34,7 +34,7 @@ services:
       - "5002:5000"
     volumes:
       - ./osrm-data/van:/data
-    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+    command: osrm-routed --algorithm mld --max-table-size 10000 /data/colombia-latest.osrm
 
   # Perfil Camión Medio - Puerto 5003
   osrm-medium:
@@ -45,7 +45,7 @@ services:
       - "5003:5000"
     volumes:
       - ./osrm-data/truck_medium:/data
-    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+    command: osrm-routed --algorithm mld --max-table-size 10000 /data/colombia-latest.osrm
 
   # Perfil Camión Pesado - Puerto 5004
   osrm-heavy:
@@ -56,21 +56,18 @@ services:
       - "5004:5000"
     volumes:
       - ./osrm-data/truck_heavy:/data
-    command: osrm-routed --algorithm mld /data/colombia-latest.osrm
+    command: osrm-routed --algorithm mld --max-table-size 10000 /data/colombia-latest.osrm
 
   # ------------------------------------------------
   # 2. OPTIMIZADOR (VROOM)
   # ------------------------------------------------
   vroom:
-    # ESTA es la imagen correcta que incluye la API (vroom-express)
     image: ghcr.io/vroom-project/vroom-docker:v1.14.0
     container_name: vroom-api
     restart: always
     ports:
-      # El frontend espera el puerto 5200, mapeado al 3000 interno
       - "5200:3000"
     volumes:
-      # Montamos tu configuración arreglada
       - ./vroom-conf:/conf
     environment:
       - VROOM_ROUTER=osrm
