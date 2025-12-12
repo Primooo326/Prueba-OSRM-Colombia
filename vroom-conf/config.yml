@@ -25,9 +25,9 @@ routingServers:
     van:
       host: 'osrm-van'
       port: '5000'
-    truck_medium:
+    truckmedium:
       host: 'osrm-medium'
       port: '5000'
-    truck_heavy:
+    truckheavy:
       host: 'osrm-heavy'
       port: '5000'
