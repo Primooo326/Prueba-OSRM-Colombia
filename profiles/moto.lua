@@ -30,17 +30,18 @@ function setup()
       max_speed_for_map_matching      = 180/3.6, 
       weight_name                     = 'routability',
       process_call_tagless_node       = false,
-      u_turn_penalty                  = 0, -- Moto gira fácil
+      u_turn_penalty                  = 60,   -- Moto gira más fácil, pero retornos costosos en Colombia
       continue_straight_at_waypoint   = true,
       use_turn_restrictions           = false,
       left_hand_driving               = false,
+      traffic_signal_penalty          = 20,   -- Motos arrancan más rápido en semáforo
     },
 
     default_mode              = mode.driving,
     default_speed             = 10,
     oneway_handling           = true,
     side_road_multiplier      = 1.0, 
-    turn_penalty              = 2.0, -- Giro rápido
+    turn_penalty              = 3.0, -- Moto gira rápido pero Colombia tiene congestión
     speed_reduction           = 1.0,
     turn_bias                 = 1.0,
     cardinal_directions       = false,
@@ -78,23 +79,23 @@ function setup()
       'area', 'reversible', 'impassable', 'hov_lanes', 'steps', 'construction', 'proposed'
     },
 
-    -- VELOCIDADES MOTO
+    -- VELOCIDADES MOTO — Realistas Colombia (filtrado de tráfico en ciudad)
     speeds = Sequence {
       highway = {
-        motorway        = 90,
-        motorway_link   = 60,
-        trunk           = 85,
-        trunk_link      = 60,
-        primary         = 70,
-        primary_link    = 45,
-        secondary       = 60,
-        secondary_link  = 40,
-        tertiary        = 50,
-        tertiary_link   = 30,
-        unclassified    = 40,
-        residential     = 35,
-        living_street   = 20,
-        service         = 20
+        motorway        = 65,  -- Autopistas, motos van un poco más
+        motorway_link   = 45,
+        trunk           = 55,  -- Troncales nacionales
+        trunk_link      = 40,
+        primary         = 40,  -- Filtra tráfico en ciudad
+        primary_link    = 30,
+        secondary       = 30,  -- Barrios con moto
+        secondary_link  = 25,
+        tertiary        = 25,
+        tertiary_link   = 20,
+        unclassified    = 22,
+        residential     = 18,  -- Moto más ágil en barrios
+        living_street   = 12,
+        service         = 15
       }
     },
 
@@ -103,10 +104,11 @@ function setup()
     construction_whitelist = Set { 'no', 'widening', 'minor' },
     route_speeds = { ferry = 5, shuttle_train = 10 },
     bridge_speeds = { movable = 5 },
-    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 80, compacted = 80, fine_gravel = 80, paving_stones = 60, metal = 60, bricks = 60, grass = 40, wood = 40, sett = 40, grass_paver = 40, gravel = 40, unpaved = 40, ground = 40, dirt = 40, pebblestone = 40, tartan = 40, cobblestone = 30, clay = 30, earth = 20, stone = 20, rocky = 20, sand = 20, mud = 10 },
-    tracktype_speeds = { grade1 = 60, grade2 = 40, grade3 = 30, grade4 = 25, grade5 = 20 },
-    smoothness_speeds = { intermediate = 80, bad = 40, very_bad = 20, horrible = 10, very_horrible = 5, impassable = 0 },
-    maxspeed_table_default = { urban = 50, rural = 90, trunk = 100, motorway = 100 },
+    -- Colombia: superficies sin pavimentar
+    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 60, compacted = 45, fine_gravel = 30, paving_stones = 45, metal = 40, bricks = 35, grass = 20, wood = 25, sett = 30, grass_paver = 20, gravel = 15, unpaved = 12, ground = 12, dirt = 8, pebblestone = 20, tartan = 35, cobblestone = 25, clay = 10, earth = 10, stone = 12, rocky = 10, sand = 8, mud = 5 },
+    tracktype_speeds = { grade1 = 45, grade2 = 30, grade3 = 20, grade4 = 12, grade5 = 8 },
+    smoothness_speeds = { intermediate = 50, bad = 25, very_bad = 12, horrible = 8, very_horrible = 5, impassable = 0 },
+    maxspeed_table_default = { urban = 30, rural = 55, trunk = 60, motorway = 70 },
     maxspeed_table = {},
     relation_types = Sequence { "route" },
     highway_turn_classification = {},
@@ -140,7 +142,14 @@ function process_node(profile, node, result, relations)
       end
     end
   end
-  
+
+  -- Penalización por semáforo
+  local highway = node:get_value_by_key("highway")
+  if highway == "traffic_signals" then
+    result.traffic_lights = true
+    result.duration = (profile.properties.traffic_signal_penalty or 0)
+  end
+
   -- Llamada segura a Handlers si existe
   if Handlers and Handlers.process_node then
       Handlers.process_node(profile, node, result, relations)
