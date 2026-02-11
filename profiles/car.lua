@@ -149,15 +149,15 @@ function process_way(profile, way, result, relations)
   if (not data.highway or data.highway == '') and (not data.route or data.route == '') then return end
 
   handlers = Sequence {
-    WayHandlers.default_mode, WayHandlers.blocked_ways, WayHandlers.avoid_ways,
-    WayHandlers.handle_height, WayHandlers.handle_width, WayHandlers.handle_length, WayHandlers.handle_weight,
-    WayHandlers.access, WayHandlers.oneway, WayHandlers.destinations, WayHandlers.ferries, WayHandlers.movables,
-    WayHandlers.service, WayHandlers.hov, WayHandlers.speed, WayHandlers.maxspeed, WayHandlers.surface,
-    WayHandlers.penalties, WayHandlers.classes, WayHandlers.turn_lanes, WayHandlers.classification,
-    WayHandlers.roundabouts, WayHandlers.startpoint, WayHandlers.driving_side, WayHandlers.names,
-    WayHandlers.weights, WayHandlers.way_classification_for_turn
+    Handlers.default_mode, Handlers.blocked_ways, Handlers.avoid_ways,
+    Handlers.handle_height, Handlers.handle_width, Handlers.handle_length, Handlers.handle_weight,
+    Handlers.access, Handlers.oneway, Handlers.destinations, Handlers.ferries, Handlers.movables,
+    Handlers.service, Handlers.hov, Handlers.speed, Handlers.maxspeed, Handlers.surface,
+    Handlers.penalties, Handlers.classes, Handlers.turn_lanes, Handlers.classification,
+    Handlers.roundabouts, Handlers.startpoint, Handlers.driving_side, Handlers.names,
+    Handlers.weights, Handlers.way_classification_for_turn
   }
-  WayHandlers.run(profile, way, result, data, handlers, relations)
+  Handlers.run(profile, way, result, data, handlers, relations)
   if profile.cardinal_directions then Relations.process_way_refs(way, relations, result) end
 end
 
