@@ -39,9 +39,9 @@ function setup()
     default_mode              = mode.driving,
     default_speed             = 10,
     oneway_handling           = true,
-    side_road_multiplier      = 0.7,
-    turn_penalty              = 12,  -- Colombia: giros con congestión pesada
-    speed_reduction           = 0.7, -- Reducción extra por congestión general
+    side_road_multiplier      = 0.5,  -- Evitar atajos por calles laterales
+    turn_penalty              = 15,   -- Giros costosos con congestión pesada
+    speed_reduction           = 0.55, -- Colombia: congestión real reduce todo
     turn_bias                 = 1.1,
     cardinal_directions       = false,
 
@@ -74,23 +74,23 @@ function setup()
     excludable = Sequence { Set {'toll'}, Set {'motorway'}, Set {'ferry'} },
     avoid = Set { 'area', 'reversible', 'impassable', 'hov_lanes', 'steps', 'construction', 'proposed' },
 
-    -- VELOCIDADES CAR — Promedios reales Colombia (incl. congestión + curvas + pueblos)
+    -- VELOCIDADES CAR — Colombia real (congestión brutal + topografía)
     speeds = Sequence {
       highway = {
-        motorway        = 45,  -- Autopistas reales promedio con tráfico
-        motorway_link   = 30,
-        trunk           = 38,  -- Troncales nacionales (curvas, pueblos)
-        trunk_link      = 25,
-        primary         = 25,  -- Vías principales ciudad con semáforos
-        primary_link    = 18,
-        secondary       = 18,  -- Conexiones entre barrios
-        secondary_link  = 14,
-        tertiary        = 14,  -- Vías terciarias
-        tertiary_link   = 10,
-        unclassified    = 12,  -- Rural / sin clasificar
-        residential     = 12,  -- Barrios residenciales
-        living_street   = 6,   -- Zonas peatonales
-        service         = 8
+        motorway        = 35,  -- Autopistas con tráfico real
+        motorway_link   = 25,
+        trunk           = 30,  -- Troncales (curvas, pueblos, peajes)
+        trunk_link      = 20,
+        primary         = 18,  -- Vías principales con semáforos
+        primary_link    = 14,
+        secondary       = 14,  -- Conexiones entre barrios
+        secondary_link  = 10,
+        tertiary        = 10,  -- Vías terciarias
+        tertiary_link   = 8,
+        unclassified    = 8,   -- Rural
+        residential     = 10,  -- Barrios residenciales
+        living_street   = 5,
+        service         = 6
       }
     },
 
@@ -100,10 +100,10 @@ function setup()
     route_speeds = { ferry = 5, shuttle_train = 10 },
     bridge_speeds = { movable = 5 },
     -- Colombia: superficies sin pavimentar penalizan drásticamente
-    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 35, compacted = 25, fine_gravel = 15, paving_stones = 25, metal = 25, bricks = 18, grass = 8, wood = 12, sett = 15, grass_paver = 8, gravel = 10, unpaved = 8, ground = 6, dirt = 4, pebblestone = 10, tartan = 18, cobblestone = 12, clay = 5, earth = 5, stone = 6, rocky = 5, sand = 3, mud = 2 },
-    tracktype_speeds = { grade1 = 25, grade2 = 15, grade3 = 10, grade4 = 6, grade5 = 3 },
-    smoothness_speeds = { intermediate = 30, bad = 15, very_bad = 8, horrible = 4, very_horrible = 2, impassable = 0 },
-    maxspeed_table_default = { urban = 20, rural = 38, trunk = 42, motorway = 50 },
+    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 22, compacted = 15, fine_gravel = 10, paving_stones = 16, metal = 16, bricks = 12, grass = 5, wood = 8, sett = 10, grass_paver = 5, gravel = 6, unpaved = 5, ground = 4, dirt = 3, pebblestone = 6, tartan = 12, cobblestone = 8, clay = 3, earth = 3, stone = 4, rocky = 3, sand = 2, mud = 1 },
+    tracktype_speeds = { grade1 = 15, grade2 = 10, grade3 = 6, grade4 = 4, grade5 = 2 },
+    smoothness_speeds = { intermediate = 18, bad = 10, very_bad = 5, horrible = 3, very_horrible = 1, impassable = 0 },
+    maxspeed_table_default = { urban = 12, rural = 28, trunk = 32, motorway = 38 },
     maxspeed_table = {},
     relation_types = Sequence { "route" },
     highway_turn_classification = {},

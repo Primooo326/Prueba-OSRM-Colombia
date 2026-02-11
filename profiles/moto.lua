@@ -40,10 +40,10 @@ function setup()
     default_mode              = mode.driving,
     default_speed             = 10,
     oneway_handling           = true,
-    side_road_multiplier      = 1.0, 
-    turn_penalty              = 4.0, -- Moto gira rápido
-    speed_reduction           = 0.85, -- Algo de reducción por congestión
-    turn_bias                 = 1.0,
+    side_road_multiplier      = 0.6,  -- Penalizar atajos por barrios
+    turn_penalty              = 8.0,  -- Penalizar giros para evitar zigzag
+    speed_reduction           = 0.6,  -- Reducción fuerte: congestión real colombiana
+    turn_bias                 = 1.075,
     cardinal_directions       = false,
 
     -- DIMENSIONES MOTO
@@ -79,23 +79,23 @@ function setup()
       'area', 'reversible', 'impassable', 'hov_lanes', 'steps', 'construction', 'proposed'
     },
 
-    -- VELOCIDADES MOTO — Promedios reales Colombia (filtra tráfico, más ágil)
+    -- VELOCIDADES MOTO — Colombia real (motos filtran algo pero congestión es brutal)
     speeds = Sequence {
       highway = {
-        motorway        = 55,  -- Autopistas, motos más rápidas
-        motorway_link   = 38,
-        trunk           = 48,  -- Troncales nacionales
-        trunk_link      = 35,
-        primary         = 32,  -- Filtra tráfico en ciudad
-        primary_link    = 25,
-        secondary       = 25,  -- Barrios con moto, filtrando
-        secondary_link  = 20,
-        tertiary        = 20,
-        tertiary_link   = 16,
-        unclassified    = 18,
-        residential     = 16,  -- Moto ágil en barrios
-        living_street   = 10,
-        service         = 12
+        motorway        = 40,  -- Autopistas con tráfico
+        motorway_link   = 28,
+        trunk           = 35,  -- Troncales nacionales
+        trunk_link      = 25,
+        primary         = 22,  -- Ciudad, algo de filtrado
+        primary_link    = 16,
+        secondary       = 16,  -- Barrios
+        secondary_link  = 12,
+        tertiary        = 12,
+        tertiary_link   = 10,
+        unclassified    = 10,
+        residential     = 12,  -- Barrios residenciales
+        living_street   = 8,
+        service         = 8
       }
     },
 
@@ -105,10 +105,10 @@ function setup()
     route_speeds = { ferry = 5, shuttle_train = 10 },
     bridge_speeds = { movable = 5 },
     -- Colombia: superficies sin pavimentar
-    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 40, compacted = 30, fine_gravel = 20, paving_stones = 30, metal = 28, bricks = 22, grass = 12, wood = 16, sett = 20, grass_paver = 12, gravel = 12, unpaved = 10, ground = 8, dirt = 6, pebblestone = 14, tartan = 22, cobblestone = 16, clay = 6, earth = 6, stone = 8, rocky = 6, sand = 5, mud = 3 },
-    tracktype_speeds = { grade1 = 30, grade2 = 20, grade3 = 12, grade4 = 8, grade5 = 5 },
-    smoothness_speeds = { intermediate = 35, bad = 18, very_bad = 10, horrible = 5, very_horrible = 3, impassable = 0 },
-    maxspeed_table_default = { urban = 25, rural = 45, trunk = 50, motorway = 58 },
+    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 25, compacted = 18, fine_gravel = 12, paving_stones = 18, metal = 16, bricks = 14, grass = 6, wood = 10, sett = 12, grass_paver = 6, gravel = 8, unpaved = 6, ground = 5, dirt = 3, pebblestone = 8, tartan = 14, cobblestone = 10, clay = 4, earth = 4, stone = 5, rocky = 4, sand = 3, mud = 2 },
+    tracktype_speeds = { grade1 = 18, grade2 = 12, grade3 = 8, grade4 = 5, grade5 = 3 },
+    smoothness_speeds = { intermediate = 20, bad = 10, very_bad = 5, horrible = 3, very_horrible = 2, impassable = 0 },
+    maxspeed_table_default = { urban = 15, rural = 30, trunk = 35, motorway = 42 },
     maxspeed_table = {},
     relation_types = Sequence { "route" },
     highway_turn_classification = {},
