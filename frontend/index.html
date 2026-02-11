@@ -3,330 +3,663 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>OSRM Multi-Perfil + VROOM Master UI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSRM Navigator — Colombia</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --vroom: #8e44ad;
-            --light: #ecf0f1;
-            --danger: #e74c3c;
-            --success: #27ae60;
-            --warning: #f39c12;
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #242836;
+            --surface3: #2e3344;
+            --text: #e4e6ef;
+            --text2: #9ca0b0;
+            --border: #2e3344;
+            --car: #3b82f6;
+            --moto: #f97316;
+            --van: #14b8a6;
+            --truck: #f59e0b;
+            --heavy: #ef4444;
+            --vroom: #a855f7;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --radius: 10px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, .4);
         }
 
         body,
         html {
             height: 100%;
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden
         }
 
-        /* LAYOUT */
         #app {
             display: flex;
             height: 100vh;
-            flex-direction: column;
+            flex-direction: column
         }
 
         #main-area {
             display: flex;
             flex: 1;
-            overflow: hidden;
+            overflow: hidden
         }
 
         /* SIDEBAR */
         #sidebar {
-            width: 360px;
-            background: #f8f9fa;
-            border-right: 1px solid #ddd;
+            width: 380px;
+            background: var(--surface);
             display: flex;
             flex-direction: column;
             z-index: 10;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid var(--border)
         }
 
-        #sidebar-header {
-            padding: 15px;
-            background: var(--primary);
-            color: white;
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #1e2235, #161929);
+            border-bottom: 1px solid var(--border)
         }
 
-        #sidebar-header h2 {
-            margin: 0;
-            font-size: 1.2rem;
+        .sidebar-header h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -.5px
         }
 
-        #sidebar-content {
+        .sidebar-header h1 span {
+            background: linear-gradient(135deg, var(--car), var(--vroom));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .sidebar-header small {
+            color: var(--text2);
+            font-size: .72rem
+        }
+
+        #sidebar-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--surface3) transparent
         }
 
-        /* TABS */
+        /* PROFILE SELECTOR */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 16px
+        }
+
+        .profile-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 4px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            background: var(--surface2);
+            cursor: pointer;
+            transition: all .25s;
+            color: var(--text2);
+            font-size: .65rem;
+            font-weight: 600
+        }
+
+        .profile-btn:hover {
+            background: var(--surface3);
+            transform: translateY(-2px)
+        }
+
+        .profile-btn.active {
+            border-color: var(--active-color, var(--car));
+            background: color-mix(in srgb, var(--active-color, var(--car)) 15%, var(--surface2));
+            color: var(--text);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--active-color, var(--car)) 30%, transparent)
+        }
+
+        .profile-btn .icon {
+            font-size: 1.4rem
+        }
+
+        .profile-specs {
+            font-size: .6rem;
+            color: var(--text2);
+            text-align: center;
+            padding: 6px 10px;
+            background: var(--surface2);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border)
+        }
+
+        /* SERVICE TABS */
         .service-tabs {
             display: flex;
-            flex-wrap: wrap;
             gap: 4px;
-            margin-bottom: 15px;
+            margin-bottom: 14px
         }
 
-        .tab-btn {
+        .svc-tab {
             flex: 1;
-            padding: 8px 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            background: white;
-            border-radius: 3px;
+            padding: 9px 4px;
             text-align: center;
-            transition: all 0.2s;
+            font-size: .72rem;
+            font-weight: 700;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text2);
+            cursor: pointer;
+            transition: all .2s;
+            text-transform: uppercase;
+            letter-spacing: .5px
         }
 
-        .tab-btn:hover {
-            background: #eee;
+        .svc-tab:hover {
+            background: var(--surface3)
         }
 
-        .tab-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            font-weight: bold;
+        .svc-tab.active {
+            background: var(--car);
+            color: #fff;
+            border-color: var(--car)
         }
 
-        .tab-btn.vroom-active {
+        .svc-tab.vroom-active {
             background: var(--vroom) !important;
             border-color: var(--vroom) !important;
-            color: white;
+            color: #fff
         }
 
-        /* CONTROLES */
-        .control-group {
-            margin-bottom: 15px;
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        /* CONTROL CARDS */
+        .card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 12px
         }
 
-        .control-group h4 {
-            margin: 0 0 10px 0;
-            font-size: 0.85rem;
-            color: var(--accent);
+        .card h4 {
+            font-size: .72rem;
             text-transform: uppercase;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            letter-spacing: 1px;
+            color: var(--text2);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px
         }
 
+        .card h4 .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        /* FORM ELEMENTS */
         label {
-            display: block;
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-            color: #444;
+            font-size: .72rem;
+            color: var(--text2);
             font-weight: 600;
+            margin-bottom: 4px;
+            display: block
         }
 
         select,
-        input[type="number"],
-        input[type="text"] {
+        input[type=number],
+        input[type=text] {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            background: #fff;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: .82rem;
+            background: var(--surface);
+            color: var(--text);
             margin-bottom: 8px;
-            box-sizing: border-box;
+            font-family: inherit;
+            outline: none;
+            transition: border .2s
         }
 
-        .vehicle-select {
-            border: 2px solid var(--accent);
-            background-color: #f0f8ff;
-            font-weight: bold;
-            color: var(--primary);
+        select:focus,
+        input:focus {
+            border-color: var(--car)
         }
 
-        /* LISTA DE PUNTOS */
-        #point-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 0.85rem;
-            color: #555;
+        /* POINT LIST */
+        .point-list {
+            list-style: none
         }
 
-        #point-list li {
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
+        .point-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: background .2s;
+            cursor: grab
+        }
+
+        .point-item:hover {
+            background: var(--surface3)
+        }
+
+        .point-item .info {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .point-item .num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .7rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .point-item .coords {
+            font-size: .7rem;
+            color: var(--text2)
         }
 
         .point-actions {
             display: flex;
-            gap: 5px;
+            gap: 4px
         }
 
-        .btn-edit {
-            background: var(--warning);
-            color: white;
+        .point-actions button {
+            width: 26px;
+            height: 26px;
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            padding: 2px 6px;
-            font-size: 0.8rem;
+            font-size: .7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s
         }
 
         .btn-del {
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            padding: 2px 6px;
-            font-size: 0.8rem;
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
         }
 
-        /* BOTONES PRINCIPALES */
-        .btn-action {
+        .btn-del:hover {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .btn-edit {
+            background: rgba(245, 158, 11, .15);
+            color: var(--truck)
+        }
+
+        .btn-edit:hover {
+            background: var(--truck);
+            color: #fff
+        }
+
+        /* BUTTONS */
+        .btn-exec {
             width: 100%;
-            padding: 12px;
-            background: var(--success);
-            color: white;
+            padding: 13px;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: .85rem;
             cursor: pointer;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            transition: background 0.2s;
+            transition: all .25s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: inherit
         }
 
-        .btn-action:hover {
-            background: #219150;
+        .btn-exec.primary {
+            background: linear-gradient(135deg, var(--car), #2563eb);
+            color: #fff
         }
 
-        .btn-vroom {
-            background: var(--vroom);
+        .btn-exec.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, .35)
         }
 
-        .btn-vroom:hover {
-            background: #7d3c98;
+        .btn-exec.vroom-mode {
+            background: linear-gradient(135deg, var(--vroom), #7c3aed) !important
         }
 
-        .btn-clear {
+        .btn-exec.vroom-mode:hover {
+            box-shadow: 0 6px 20px rgba(168, 85, 247, .35) !important
+        }
+
+        .btn-exec.danger {
+            background: var(--surface3);
+            color: var(--text2);
+            margin-top: 6px
+        }
+
+        .btn-exec.danger:hover {
             background: var(--danger);
-            margin-top: 8px;
+            color: #fff
         }
 
-        /* MAPA & PANEL */
+        .btn-reverse {
+            background: var(--surface3);
+            color: var(--text2);
+            border: 1px solid var(--border);
+            padding: 7px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: .72rem;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: all .2s;
+            font-family: inherit
+        }
+
+        .btn-reverse:hover {
+            background: var(--surface);
+            border-color: var(--car);
+            color: var(--text)
+        }
+
+        /* MAP */
         #map {
             flex: 1;
-            background: #eee;
+            background: #111
         }
 
+        /* BOTTOM PANEL */
         #data-panel {
-            height: 250px;
-            background: white;
-            border-top: 3px solid var(--accent);
+            height: 220px;
+            background: var(--surface);
+            border-top: 2px solid var(--border);
             display: flex;
             flex-direction: column;
-            transition: height 0.3s;
             z-index: 20;
+            transition: height .35s cubic-bezier(.4, 0, .2, 1)
+        }
+
+        #data-panel.collapsed {
+            height: 40px
         }
 
         .panel-tabs {
             display: flex;
-            background: #f1f1f1;
-            border-bottom: 1px solid #ddd;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            min-height: 40px;
+            align-items: stretch
         }
 
         .panel-tab {
             padding: 10px 20px;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #666;
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text2);
+            transition: all .2s;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .panel-tab:hover {
+            color: var(--text)
         }
 
         .panel-tab.active {
-            background: white;
-            color: var(--accent);
-            border-top: 3px solid var(--accent);
-            margin-top: -3px;
+            color: var(--car);
+            border-bottom-color: var(--car)
         }
 
-        .panel-content {
+        .panel-tab.toggle {
+            margin-left: auto;
+            font-size: 1rem
+        }
+
+        .panel-body {
             flex: 1;
             overflow: auto;
-            padding: 20px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.9rem;
+            padding: 16px;
+            font-size: .82rem
         }
 
         .json-pre {
             white-space: pre-wrap;
-            color: #2c3e50;
+            color: var(--text2);
+            font-family: 'Fira Code', monospace;
+            font-size: .75rem
+        }
+
+        /* ROUTE SUMMARY */
+        .route-summary {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px
+        }
+
+        .stat-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            min-width: 140px
+        }
+
+        .stat-card .val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text)
+        }
+
+        .stat-card .lbl {
+            font-size: .68rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px
+        }
+
+        /* INSTRUCTIONS */
+        .step-list {
+            list-style: none
+        }
+
+        .step-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .2s;
+            border-radius: 4px;
+            padding-left: 8px
+        }
+
+        .step-item:hover {
+            background: var(--surface2)
+        }
+
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            flex-shrink: 0
+        }
+
+        .step-info .street {
+            font-weight: 600;
+            font-size: .82rem
+        }
+
+        .step-info .meta {
+            font-size: .7rem;
+            color: var(--text2);
+            margin-top: 2px
+        }
+
+        /* VROOM CONFIG */
+        .vroom-config {
+            display: none
+        }
+
+        .vroom-config.show {
+            display: block
+        }
+
+        .half-row {
+            display: flex;
+            gap: 10px
+        }
+
+        .half-row>div {
+            flex: 1
+        }
+
+        /* MATRIX */
+        .matrix-wrap {
+            overflow: auto
         }
 
         .matrix-table {
-            width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
+            font-size: .72rem;
+            width: 100%
         }
 
         .matrix-table th,
         .matrix-table td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: center;
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            text-align: center
+        }
+
+        .matrix-table th {
+            background: var(--surface2);
+            color: var(--text2);
+            font-weight: 600
+        }
+
+        .matrix-table td {
+            color: var(--text)
         }
 
         /* MODAL */
         #modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(4px)
         }
 
         #modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 14px;
+            width: 340px;
+            box-shadow: var(--shadow)
         }
 
         #modal-header {
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: var(--primary);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border)
         }
 
         .modal-footer {
-            margin-top: 15px;
+            margin-top: 16px;
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 8px
         }
 
-        .half-row {
+        .modal-footer button {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all .2s
+        }
+
+        /* LOADING */
+        .loading {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
+            color: var(--text2)
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--car);
+            border-radius: 50%;
+            animation: spin .7s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--text2);
+            font-size: .8rem
+        }
+
+        .empty-state .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: .5
         }
     </style>
     <script
@@ -334,452 +667,460 @@
 </head>
 
 <body>
-
     <div id="app">
         <div id="main-area">
             <aside id="sidebar">
-                <div id="sidebar-header">
-                    <h2>OSRM & VROOM</h2>
-                    <small>Master API UI (Port 5200)</small>
+                <div class="sidebar-header">
+                    <h1><span>OSRM Navigator</span></h1>
+                    <small>Multi-Perfil Routing • Colombia</small>
                 </div>
-                <div id="sidebar-content">
+                <div id="sidebar-scroll">
+                    <!-- PROFILE SELECTOR -->
+                    <div class="profile-grid" id="profile-grid"></div>
+                    <div class="profile-specs" id="profile-specs"></div>
 
-                    <div class="control-group" style="border-left: 4px solid var(--accent);">
-                        <h4>1. Flota (Vehículo Principal)</h4>
-                        <select id="vehicle-profile" class="vehicle-select" onchange="onProfileChange()">
-                            <option value="car">🚗 Carro (osrm-car)</option>
-                            <option value="moto">🏍️ Moto (osrm-moto)</option>
-                            <option value="van">🚐 Van (osrm-van)</option>
-                            <option value="truck_medium">🚚 Camión Medio</option>
-                            <option value="truck_heavy">🚛 Camión Pesado</option>
-                        </select>
-
-                        <div id="vroom-vehicle-config"
-                            style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
-                            <div class="half-row">
-                                <div><label>Capacidad</label><input type="number" id="v-capacity" value="100"></div>
-                                <div><label>Skills (ej: 1,2)</label><input type="text" id="v-skills" placeholder="1, 2">
-                                </div>
-                            </div>
-                            <div class="half-row">
-                                <div><label>Inicio Turno (s)</label><input type="number" id="v-start-time" value="0">
-                                </div>
-                                <div><label>Fin Turno (s)</label><input type="number" id="v-end-time" value="28800">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="font-size: 0.75rem; color:#666; margin-top:5px">
-                            <span id="vroom-port-display">VROOM Port: 5200</span>
-                        </div>
+                    <!-- SERVICE TABS -->
+                    <div class="service-tabs" id="service-tabs">
+                        <div class="svc-tab active" data-svc="route">🧭 Ruta</div>
+                        <div class="svc-tab" data-svc="trip">🔄 TSP</div>
+                        <div class="svc-tab" data-svc="vroom">⚡ VROOM</div>
+                        <div class="svc-tab" data-svc="table">📊 Matriz</div>
                     </div>
 
-                    <div class="service-tabs">
-                        <div class="tab-btn active" onclick="setService('route')">Ruta</div>
-                        <div class="tab-btn" onclick="setService('trip')">TSP</div>
-                        <div class="tab-btn" onclick="setService('vroom')">VROOM</div>
-                        <div class="tab-btn" onclick="setService('table')">Matriz</div>
-                    </div>
-
-                    <p id="desc-text" style="font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 10px;">
-                        Ruta punto a punto estándar.
+                    <p id="desc-text" style="font-size:.72rem;color:var(--text2);margin-bottom:12px;font-style:italic">
                     </p>
 
+                    <!-- SERVICE PARAMS -->
                     <div id="params-container"></div>
 
-                    <div class="control-group">
-                        <h4>Puntos (<span id="point-count">0</span>)</h4>
-                        <ul id="point-list">
-                            <li style="font-style:italic; color:#999;">Haz clic en el mapa...</li>
+                    <!-- VROOM VEHICLE CONFIG -->
+                    <div class="card vroom-config" id="vroom-vehicle-config">
+                        <h4>
+                            <div class="dot" style="background:var(--vroom)"></div>Vehículo VROOM
+                        </h4>
+                        <div class="half-row">
+                            <div><label>Capacidad</label><input type="number" id="v-capacity" value="100"></div>
+                            <div><label>Skills (1,2..)</label><input type="text" id="v-skills" placeholder="1, 2"></div>
+                        </div>
+                        <div class="half-row">
+                            <div><label>Inicio Turno (s)</label><input type="number" id="v-start-time" value="0"></div>
+                            <div><label>Fin Turno (s)</label><input type="number" id="v-end-time" value="28800"></div>
+                        </div>
+                    </div>
+
+                    <!-- POINTS -->
+                    <div class="card">
+                        <h4>
+                            <div class="dot" style="background:var(--success)"></div>Puntos (<span
+                                id="point-count">0</span>)
+                        </h4>
+                        <button class="btn-reverse" onclick="reversePoints()">↕ Invertir Ruta</button>
+                        <ul class="point-list" id="point-list">
+                            <li class="empty-state">
+                                <div class="icon">📍</div>Haz clic en el mapa para agregar puntos
+                            </li>
                         </ul>
                     </div>
 
-                    <button id="btn-execute" class="btn-action" onclick="executeService()">CALCULAR</button>
-                    <button class="btn-action btn-clear" onclick="clearAll()">LIMPIAR</button>
+                    <button class="btn-exec primary" id="btn-execute" onclick="executeService()">🚀 CALCULAR
+                        RUTA</button>
+                    <button class="btn-exec danger" onclick="clearAll()">🗑 LIMPIAR TODO</button>
                 </div>
             </aside>
-
             <div id="map"></div>
         </div>
 
         <div id="data-panel">
             <div class="panel-tabs">
-                <div class="panel-tab active" onclick="setPanelTab('summary')">Resumen</div>
-                <div class="panel-tab" onclick="setPanelTab('json')">JSON</div>
-                <div class="panel-tab" onclick="togglePanel()" style="margin-left: auto;">↕</div>
+                <div class="panel-tab active" data-panel="summary">📊 Resumen</div>
+                <div class="panel-tab" data-panel="instructions">🧭 Instrucciones</div>
+                <div class="panel-tab" data-panel="json">{ } JSON</div>
+                <div class="panel-tab toggle" onclick="togglePanel()">⬇</div>
             </div>
-            <div id="panel-content-area" class="panel-content">
-                <div id="view-summary">Esperando datos...</div>
-                <div id="view-json" style="display:none;">
+            <div class="panel-body">
+                <div id="view-summary">
+                    <div class="empty-state">
+                        <div class="icon">🗺️</div>Selecciona puntos y calcula una ruta
+                    </div>
+                </div>
+                <div id="view-instructions" style="display:none"></div>
+                <div id="view-json" style="display:none">
                     <pre class="json-pre">{}</pre>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL -->
     <div id="modal-overlay">
         <div id="modal-content">
-            <div id="modal-header">Editar Trabajo / Punto</div>
+            <div id="modal-header">⚙️ Configurar Trabajo</div>
             <input type="hidden" id="edit-id">
-
-            <label>Demanda / Entrega</label>
-            <input type="number" id="edit-delivery" value="10">
-
-            <label>Tiempo Servicio (segundos)</label>
-            <input type="number" id="edit-service" value="300">
-
+            <label>Demanda / Entrega</label><input type="number" id="edit-delivery" value="10">
+            <label>Tiempo Servicio (s)</label><input type="number" id="edit-service" value="300">
             <div class="half-row">
-                <div>
-                    <label>Ventana Inicio</label>
-                    <input type="number" id="edit-tw-start" placeholder="0">
-                </div>
-                <div>
-                    <label>Ventana Fin</label>
-                    <input type="number" id="edit-tw-end" placeholder="86400">
-                </div>
+                <div><label>Ventana Inicio</label><input type="number" id="edit-tw-start" placeholder="0"></div>
+                <div><label>Ventana Fin</label><input type="number" id="edit-tw-end" placeholder="86400"></div>
             </div>
-
             <div class="half-row">
-                <div>
-                    <label>Prioridad (0-100)</label>
-                    <input type="number" id="edit-priority" value="50">
-                </div>
-                <div>
-                    <label>Skills Req.</label>
-                    <input type="text" id="edit-skills" placeholder="ej: 1">
-                </div>
+                <div><label>Prioridad (0-100)</label><input type="number" id="edit-priority" value="50"></div>
+                <div><label>Skills Req.</label><input type="text" id="edit-skills" placeholder="ej: 1"></div>
             </div>
-
             <div class="modal-footer">
-                <button onclick="closeModal()"
-                    style="padding:8px; border:none; background:#ccc; cursor:pointer; border-radius:4px;">Cancelar</button>
-                <button onclick="savePointData()"
-                    style="padding:8px; border:none; background:var(--accent); color:white; cursor:pointer; border-radius:4px;">Guardar</button>
+                <button onclick="closeModal()" style="background:var(--surface3);color:var(--text2)">Cancelar</button>
+                <button onclick="savePointData()" style="background:var(--car);color:#fff">Guardar</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_VROOM = "http://localhost:5200";
-        const HOST = "http://localhost";
-
+        /* ========== CONFIG ========== */
+        const API_VROOM = "http://localhost:5200", HOST = "http://localhost";
         const PROFILES = {
-            car: { directPort: 5000, vroomProfile: "car" },
-            moto: { directPort: 5001, vroomProfile: "moto" },
-            van: { directPort: 5002, vroomProfile: "van" },
-            truck_medium: { directPort: 5003, vroomProfile: "truck_medium" },
-            truck_heavy: { directPort: 5004, vroomProfile: "truck_heavy" }
+            car: { port: 5000, label: "Carro", icon: "🚗", color: "#3b82f6", specs: "2.0m alto • 1.9m ancho • 2T", h: 2, w: 1.9, wt: "2T" },
+            moto: { port: 5001, label: "Moto", icon: "🏍️", color: "#f97316", specs: "1.5m alto • 1.0m ancho • 300kg", h: 1.5, w: 1, wt: "300kg" },
+            van: { port: 5002, label: "Van", icon: "🚐", color: "#14b8a6", specs: "2.6m alto • 2.2m ancho • 3.5T", h: 2.6, w: 2.2, wt: "3.5T" },
+            truck_medium: { port: 5003, label: "Camión", icon: "🚚", color: "#f59e0b", specs: "3.8m alto • 2.5m ancho • 10T", h: 3.8, w: 2.5, wt: "10T" },
+            truck_heavy: { port: 5004, label: "Pesado", icon: "🚛", color: "#ef4444", specs: "4.5m alto • 2.6m ancho • 40T", h: 4.5, w: 2.6, wt: "40T" }
+        };
+        const SVC_DESC = {
+            route: "Calcula la ruta más óptima entre los puntos seleccionados.",
+            trip: "Optimiza el orden de visita (Problema del Viajero Comerciante).",
+            vroom: "Optimización avanzada con restricciones de capacidad, skills y ventanas de tiempo.",
+            table: "Genera la matriz de distancias/duraciones NxN entre todos los puntos."
+        };
+        const MANEUVER_ICONS = {
+            depart: "🚩", arrive: "🏁", "turn-left": "⬅️", "turn-right": "➡️", "turn-slight-left": "↖️",
+            "turn-slight-right": "↗️", "turn-sharp-left": "↩️", "turn-sharp-right": "↪️",
+            "continue": "⬆️", "roundabout-turn": "🔄", "merge-left": "🔀", "merge-right": "🔀",
+            "fork-left": "↙️", "fork-right": "↘️", "end-of-road-left": "⬅️", "end-of-road-right": "➡️",
+            "new-name": "⬆️", "straight": "⬆️", roundabout: "🔄", "rotary": "🔄", uturn: "🔃"
         };
 
-        // --- ESTADO ---
-        let currentService = 'route';
-        let currentProfileKey = 'car';
-        let map;
-        let points = [];
-        let resultObjects = [];
-        let isPanelOpen = true;
+        /* ========== STATE ========== */
+        let currentService = "route", currentProfile = "car", map, points = [], resultObjects = [], isPanelOpen = true, lastData = null;
 
-        const servicesConfig = {
-            route: { desc: "Ruta A -> B (Orden fijo)", params: `<div class="checkbox-row"><input type="checkbox" id="p-steps" checked> Steps</div>` },
-            trip: { desc: "TSP (Viajero Comerciante)", params: `<select id="p-roundtrip"><option value="true">Circular</option><option value="false">Lineal</option></select>` },
-            vroom: { desc: "Optimización VROOM (Time Windows, Skills)", params: `` }, // Params moved to sidebar top
-            table: { desc: "Matriz NxM", params: `<select id="p-annotations"><option value="duration">Duración</option></select>` }
-        };
-
+        /* ========== INIT ========== */
         function initMap() {
-            const mapEl = document.getElementById('map');
-            if (!mapEl) return;
-            map = new google.maps.Map(mapEl, { zoom: 13, center: { lat: 4.62, lng: -74.10 }, disableDefaultUI: true, zoomControl: true });
-            map.addListener("click", (e) => addPoint(e.latLng.lat(), e.latLng.lng()));
-            setService('route');
-            onProfileChange();
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13, center: { lat: 4.62, lng: -74.10 },
+                disableDefaultUI: true, zoomControl: true,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#304a7d" }] },
+                    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#255763" }] },
+                    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#2c6675" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1626" }] },
+                    { featureType: "poi", stylers: [{ visibility: "off" }] },
+                    { featureType: "transit", stylers: [{ visibility: "off" }] }
+                ]
+            });
+            map.addListener("click", e => addPoint(e.latLng.lat(), e.latLng.lng()));
+            buildProfileGrid();
+            bindTabs();
+            setService("route");
         }
 
-        function onProfileChange() {
-            const select = document.getElementById('vehicle-profile');
-            currentProfileKey = select.value;
-            const config = PROFILES[currentProfileKey];
-            document.getElementById('vroom-port-display').innerText = `VROOM: ${config.vroomProfile} | Direct: ${config.directPort}`;
+        function buildProfileGrid() {
+            const grid = document.getElementById("profile-grid");
+            grid.innerHTML = "";
+            Object.entries(PROFILES).forEach(([k, p]) => {
+                const btn = document.createElement("div");
+                btn.className = "profile-btn" + (k === currentProfile ? " active" : "");
+                btn.style.setProperty("--active-color", p.color);
+                btn.innerHTML = `<span class="icon">${p.icon}</span>${p.label}`;
+                btn.onclick = () => selectProfile(k);
+                grid.appendChild(btn);
+            });
+            updateProfileSpecs();
         }
 
-        function setService(service) {
-            currentService = service;
-            // UI Update
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('active', 'vroom-active');
-                if (b.innerText.toLowerCase().includes(service.substr(0, 3))) {
-                    if (service === 'vroom') {
-                        b.classList.add('vroom-active');
-                        document.getElementById('btn-execute').classList.add('btn-vroom');
-                        document.getElementById('vroom-vehicle-config').style.display = 'block';
-                    } else {
-                        b.classList.add('active');
-                        document.getElementById('btn-execute').classList.remove('btn-vroom');
-                        document.getElementById('vroom-vehicle-config').style.display = 'none';
-                    }
+        function selectProfile(key) {
+            currentProfile = key;
+            document.querySelectorAll(".profile-btn").forEach(b => b.classList.remove("active"));
+            const btns = document.querySelectorAll(".profile-btn");
+            const keys = Object.keys(PROFILES);
+            const idx = keys.indexOf(key);
+            if (btns[idx]) { btns[idx].classList.add("active"); btns[idx].style.setProperty("--active-color", PROFILES[key].color) }
+            updateProfileSpecs();
+            // Update accent colors
+            document.querySelectorAll(".svc-tab.active").forEach(t => { if (!t.classList.contains("vroom-active")) t.style.background = PROFILES[key].color });
+            updateMarkerColors();
+        }
+
+        function updateProfileSpecs() {
+            const p = PROFILES[currentProfile];
+            document.getElementById("profile-specs").innerHTML = `${p.icon} <strong>${p.label}</strong> — ${p.specs} | Puerto: ${p.port}`;
+        }
+
+        function updateMarkerColors() {
+            const color = PROFILES[currentProfile].color;
+            points.forEach((p, i) => {
+                const lbl = currentService === "vroom" && i === 0 ? "D" : String(i + 1);
+                p.marker.setIcon({ path: google.maps.SymbolPath.CIRCLE, scale: 12, fillColor: currentService === "vroom" && i === 0 ? PROFILES[currentProfile].color : color, fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2 });
+                p.marker.setLabel({ text: lbl, color: "#fff", fontSize: "11px", fontWeight: "700" });
+            });
+        }
+
+        /* ========== TABS ========== */
+        function bindTabs() {
+            document.querySelectorAll(".svc-tab").forEach(t => t.addEventListener("click", () => setService(t.dataset.svc)));
+            document.querySelectorAll(".panel-tab[data-panel]").forEach(t => t.addEventListener("click", () => setPanelTab(t.dataset.panel)));
+        }
+
+        function setService(svc) {
+            currentService = svc;
+            const color = PROFILES[currentProfile].color;
+            document.querySelectorAll(".svc-tab").forEach(b => {
+                b.classList.remove("active", "vroom-active");
+                b.style.background = ""; b.style.borderColor = "";
+                if (b.dataset.svc === svc) {
+                    if (svc === "vroom") { b.classList.add("vroom-active") }
+                    else { b.classList.add("active"); b.style.background = color; b.style.borderColor = color }
                 }
             });
-            document.getElementById('desc-text').innerText = servicesConfig[service].desc;
-            document.getElementById('params-container').innerHTML = servicesConfig[service].params || "";
+            document.getElementById("desc-text").innerText = SVC_DESC[svc];
+            const btn = document.getElementById("btn-execute");
+            btn.className = svc === "vroom" ? "btn-exec primary vroom-mode" : "btn-exec primary";
+            btn.innerText = svc === "vroom" ? "⚡ OPTIMIZAR VROOM" : svc === "table" ? "📊 CALCULAR MATRIZ" : svc === "trip" ? "🔄 OPTIMIZAR TSP" : "🚀 CALCULAR RUTA";
+            document.getElementById("vroom-vehicle-config").className = svc === "vroom" ? "card vroom-config show" : "card vroom-config";
+
+            // Service-specific params
+            const pc = document.getElementById("params-container");
+            if (svc === "trip") pc.innerHTML = `<div class="card"><h4>Modo TSP</h4><select id="p-roundtrip"><option value="true">🔄 Circular (volver al inicio)</option><option value="false">➡️ Lineal (no retorno)</option></select></div>`;
+            else if (svc === "route") pc.innerHTML = `<div class="card"><h4>Opciones de Ruta</h4><label><input type="checkbox" id="p-steps" checked style="width:auto;margin-right:6px">Incluir instrucciones paso a paso</label></div>`;
+            else pc.innerHTML = "";
             updatePointList();
         }
 
+        /* ========== POINTS ========== */
         function addPoint(lat, lng) {
-            let label = (points.length + 1).toString();
-            // Default Data Object for Advanced VROOM features
-            const pointData = {
-                lat, lng,
-                marker: null,
-                delivery: 10,
-                service: 300,
-                twStart: null,
-                twEnd: null,
-                priority: 50,
-                skills: ""
-            };
-
-            if (currentService === 'vroom' && points.length === 0) label = "D"; // Depot
-
+            const color = PROFILES[currentProfile].color;
+            const idx = points.length;
+            const lbl = currentService === "vroom" && idx === 0 ? "D" : String(idx + 1);
             const marker = new google.maps.Marker({
-                position: { lat, lng }, map: map,
-                label: { text: label, color: "white" },
-                title: `Punto`
+                position: { lat, lng }, map,
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 12, fillColor: currentService === "vroom" && idx === 0 ? "#a855f7" : color, fillOpacity: 1, strokeColor: "#fff", strokeWeight: 2 },
+                label: { text: lbl, color: "#fff", fontSize: "11px", fontWeight: "700" },
+                draggable: true, title: `Punto ${idx + 1}`
             });
-
-            pointData.marker = marker;
-            points.push(pointData);
+            marker.addListener("dragend", () => { const pos = marker.getPosition(); points[idx].lat = pos.lat(); points[idx].lng = pos.lng(); updatePointList() });
+            marker.addListener("rightclick", () => removePoint(idx));
+            points.push({ lat, lng, marker, delivery: 10, service: 300, twStart: null, twEnd: null, priority: 50, skills: "" });
             updatePointList();
         }
 
         function updatePointList() {
-            const list = document.getElementById('point-list');
-            document.getElementById('point-count').innerText = points.length;
+            const list = document.getElementById("point-list");
+            document.getElementById("point-count").innerText = points.length;
+            if (!points.length) { list.innerHTML = `<li class="empty-state"><div class="icon">📍</div>Haz clic en el mapa para agregar puntos</li>`; return }
             list.innerHTML = "";
-
+            const color = PROFILES[currentProfile].color;
             points.forEach((p, i) => {
-                let role = `P${i + 1}`;
-                let isDepot = false;
-                if (currentService === 'vroom' && i === 0) {
-                    role = "🏢 Depósito";
-                    isDepot = true;
-                } else if (currentService === 'vroom') {
-                    role = `📦 Job ${i}`;
-                }
-
-                let html = `<li>
-                    <div>
-                        <strong>${role}</strong><br>
-                        <small style="color:#888">${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}</small>
-                    </div>`;
-
-                // Botón editar solo para Jobs (no Depósito en v1)
-                if (!isDepot && currentService === 'vroom') {
-                    html += `<div class="point-actions">
-                                <button class="btn-edit" onclick="openModal(${i})">⚙️</button>
-                                <button class="btn-del" onclick="removePoint(${i})">✖</button>
-                             </div>`;
-                } else if (!isDepot) {
-                    html += `<div class="point-actions"><button class="btn-del" onclick="removePoint(${i})">✖</button></div>`;
-                }
-
-                html += `</li>`;
-                list.innerHTML += html;
+                const isDepot = currentService === "vroom" && i === 0;
+                const role = isDepot ? "🏢 Depósito" : currentService === "vroom" ? `📦 Job ${i}` : `Punto ${i + 1}`;
+                const bgColor = isDepot ? "var(--vroom)" : color;
+                let actions = `<button class="btn-del" onclick="event.stopPropagation();removePoint(${i})" title="Eliminar">✕</button>`;
+                if (currentService === "vroom" && !isDepot) actions = `<button class="btn-edit" onclick="event.stopPropagation();openModal(${i})" title="Configurar">⚙</button>` + actions;
+                list.innerHTML += `<li class="point-item"><div class="info"><div class="num" style="background:${bgColor}">${isDepot ? "D" : i + 1}</div><div><strong style="font-size:.78rem">${role}</strong><div class="coords">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</div></div></div><div class="point-actions">${actions}</div></li>`;
             });
         }
 
-        function removePoint(index) {
-            points[index].marker.setMap(null);
-            points.splice(index, 1);
-            // Re-label markers
+        function removePoint(idx) {
+            points[idx].marker.setMap(null); points.splice(idx, 1);
             points.forEach((p, i) => {
-                let label = (i + 1).toString();
-                if (currentService === 'vroom') label = i === 0 ? "D" : i.toString();
-                p.marker.setLabel({ text: label, color: "white" });
+                const lbl = currentService === "vroom" && i === 0 ? "D" : String(i + 1);
+                p.marker.setLabel({ text: lbl, color: "#fff", fontSize: "11px", fontWeight: "700" });
+                // Rebind dragend
+                google.maps.event.clearListeners(p.marker, "dragend");
+                google.maps.event.clearListeners(p.marker, "rightclick");
+                const ci = i;
+                p.marker.addListener("dragend", () => { const pos = p.marker.getPosition(); points[ci].lat = pos.lat(); points[ci].lng = pos.lng(); updatePointList() });
+                p.marker.addListener("rightclick", () => removePoint(ci));
+            });
+            updatePointList();
+        }
+
+        function reversePoints() {
+            if (points.length < 2) return;
+            points.reverse();
+            points.forEach((p, i) => {
+                const lbl = currentService === "vroom" && i === 0 ? "D" : String(i + 1);
+                p.marker.setLabel({ text: lbl, color: "#fff", fontSize: "11px", fontWeight: "700" });
             });
             updatePointList();
         }
 
         function clearAll() {
-            points.forEach(p => p.marker.setMap(null));
-            resultObjects.forEach(o => o.setMap(null));
-            points = []; resultObjects = [];
+            points.forEach(p => p.marker.setMap(null)); resultObjects.forEach(o => o.setMap(null));
+            points = []; resultObjects = []; lastData = null;
             updatePointList();
-            document.getElementById('view-summary').innerText = "Esperando datos...";
-            document.getElementById('view-json').style.display = 'none';
+            document.getElementById("view-summary").innerHTML = `<div class="empty-state"><div class="icon">🗺️</div>Selecciona puntos y calcula una ruta</div>`;
+            document.getElementById("view-instructions").innerHTML = "";
+            document.querySelector("#view-json .json-pre").innerText = "{}";
         }
 
-        // --- MODAL LOGIC ---
-        function openModal(index) {
-            const p = points[index];
-            document.getElementById('edit-id').value = index;
-            document.getElementById('edit-delivery').value = p.delivery;
-            document.getElementById('edit-service').value = p.service;
-            document.getElementById('edit-tw-start').value = p.twStart;
-            document.getElementById('edit-tw-end').value = p.twEnd;
-            document.getElementById('edit-priority').value = p.priority;
-            document.getElementById('edit-skills').value = p.skills;
-
-            document.getElementById('modal-overlay').style.display = 'flex';
+        /* ========== MODAL ========== */
+        function openModal(i) {
+            const p = points[i];
+            document.getElementById("edit-id").value = i;
+            document.getElementById("edit-delivery").value = p.delivery;
+            document.getElementById("edit-service").value = p.service;
+            document.getElementById("edit-tw-start").value = p.twStart || "";
+            document.getElementById("edit-tw-end").value = p.twEnd || "";
+            document.getElementById("edit-priority").value = p.priority;
+            document.getElementById("edit-skills").value = p.skills;
+            document.getElementById("modal-overlay").style.display = "flex";
         }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
-
+        function closeModal() { document.getElementById("modal-overlay").style.display = "none" }
         function savePointData() {
-            const index = parseInt(document.getElementById('edit-id').value);
-            const p = points[index];
-
-            p.delivery = parseInt(document.getElementById('edit-delivery').value) || 0;
-            p.service = parseInt(document.getElementById('edit-service').value) || 0;
-            p.twStart = document.getElementById('edit-tw-start').value ? parseInt(document.getElementById('edit-tw-start').value) : null;
-            p.twEnd = document.getElementById('edit-tw-end').value ? parseInt(document.getElementById('edit-tw-end').value) : null;
-            p.priority = parseInt(document.getElementById('edit-priority').value) || 50;
-            p.skills = document.getElementById('edit-skills').value;
-
-            closeModal();
-            // Visual feedback could be added here
-            alert(`Job ${index} actualizado.`);
+            const i = parseInt(document.getElementById("edit-id").value), p = points[i];
+            p.delivery = parseInt(document.getElementById("edit-delivery").value) || 0;
+            p.service = parseInt(document.getElementById("edit-service").value) || 0;
+            p.twStart = document.getElementById("edit-tw-start").value ? parseInt(document.getElementById("edit-tw-start").value) : null;
+            p.twEnd = document.getElementById("edit-tw-end").value ? parseInt(document.getElementById("edit-tw-end").value) : null;
+            p.priority = parseInt(document.getElementById("edit-priority").value) || 50;
+            p.skills = document.getElementById("edit-skills").value;
+            closeModal(); updatePointList();
         }
 
-        // --- API EXECUTION ---
+        /* ========== API ========== */
         async function executeService() {
-            if (points.length < 2) { alert("Mínimo 2 puntos."); return; }
-            const statusDiv = document.getElementById('view-summary');
-            statusDiv.innerHTML = "⏳ Enviando a API Master...";
-
-            const profileConfig = PROFILES[currentProfileKey];
+            if (points.length < 2) { alert("Mínimo 2 puntos."); return }
+            const summary = document.getElementById("view-summary");
+            summary.innerHTML = `<div class="loading"><div class="spinner"></div>Calculando con perfil ${PROFILES[currentProfile].icon} ${PROFILES[currentProfile].label}...</div>`;
+            const pf = PROFILES[currentProfile];
             let url = "", method = "GET", body = null;
-
             try {
-                if (currentService === 'vroom') {
-                    url = API_VROOM + "/";
-                    method = "POST";
+                if (currentService === "vroom") {
+                    url = API_VROOM + "/"; method = "POST";
                     const depot = points[0];
-
-                    // Vehicle Config
-                    const vCap = parseInt(document.getElementById('v-capacity').value);
-                    const vSkillsStr = document.getElementById('v-skills').value;
-                    const vSkills = vSkillsStr ? vSkillsStr.split(',').map(Number) : undefined;
-                    const vStartT = parseInt(document.getElementById('v-start-time').value);
-                    const vEndT = parseInt(document.getElementById('v-end-time').value);
-
-                    const payload = {
-                        vehicles: [{
-                            id: 1,
-                            profile: profileConfig.vroomProfile,
-                            start: [depot.lng, depot.lat],
-                            end: [depot.lng, depot.lat],
-                            capacity: [vCap],
-                            skills: vSkills,
-                            time_window: [vStartT, vEndT]
-                        }],
+                    const vCap = parseInt(document.getElementById("v-capacity").value);
+                    const vSk = document.getElementById("v-skills").value;
+                    const vSkills = vSk ? vSk.split(",").map(Number) : undefined;
+                    const vST = parseInt(document.getElementById("v-start-time").value);
+                    const vET = parseInt(document.getElementById("v-end-time").value);
+                    body = JSON.stringify({
+                        vehicles: [{ id: 1, profile: currentProfile, start: [depot.lng, depot.lat], end: [depot.lng, depot.lat], capacity: [vCap], skills: vSkills, time_window: [vST, vET] }],
                         jobs: points.slice(1).map((p, idx) => {
-                            const job = {
-                                id: idx + 1,
-                                location: [p.lng, p.lat],
-                                delivery: [p.delivery],
-                                service: p.service,
-                                priority: p.priority
-                            };
-                            // Add optional fields only if set
-                            if (p.twStart !== null && p.twEnd !== null) {
-                                job.time_windows = [[p.twStart, p.twEnd]];
-                            }
-                            if (p.skills) {
-                                job.skills = p.skills.split(',').map(Number);
-                            }
-                            return job;
+                            const j = { id: idx + 1, location: [p.lng, p.lat], delivery: [p.delivery], service: p.service, priority: p.priority };
+                            if (p.twStart !== null && p.twEnd !== null) j.time_windows = [[p.twStart, p.twEnd]];
+                            if (p.skills) j.skills = p.skills.split(",").map(Number);
+                            return j;
                         }),
                         options: { g: true }
-                    };
-                    body = JSON.stringify(payload);
+                    });
+                } else {
+                    const coords = points.map(p => `${p.lng},${p.lat}`).join(";");
+                    url = `${HOST}:${pf.port}/${currentService}/v1/driving/${coords}?overview=full&geometries=polyline`;
+                    if (currentService === "route") { const stepsEl = document.getElementById("p-steps"); if (stepsEl && stepsEl.checked) url += "&steps=true" }
+                    if (currentService === "trip") url += `&roundtrip=${document.getElementById("p-roundtrip").value}`;
+                    if (currentService === "table") url += `&annotations=duration`;
                 }
-                else {
-                    // OSRM STANDARD LOGIC
-                    const port = profileConfig.directPort;
-                    const coords = points.map(p => `${p.lng},${p.lat}`).join(';');
-                    url = `${HOST}:${port}/${currentService}/v1/driving/${coords}?overview=full&geometries=polyline`;
-                    if (currentService === 'trip') url += `&roundtrip=${document.getElementById('p-roundtrip').value}`;
-                    if (currentService === 'table') url += `&annotations=duration`;
-                }
-
-                console.log("Payload:", body);
-
-                const res = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : undefined, body });
-                const data = await res.json();
-
-                document.querySelector('#view-json .json-pre').innerText = JSON.stringify(data, null, 2);
+                const res = await fetch(url, { method, headers: body ? { "Content-Type": "application/json" } : undefined, body });
+                const data = await res.json(); lastData = data;
+                document.querySelector("#view-json .json-pre").innerText = JSON.stringify(data, null, 2);
                 renderResults(data);
-
-            } catch (e) {
-                statusDiv.innerHTML = `<div style="color:red;">Error: ${e.message}</div>`;
-                console.error(e);
-            }
+            } catch (e) { summary.innerHTML = `<div style="color:var(--danger);font-weight:600">❌ Error: ${e.message}</div>`; console.error(e) }
         }
 
+        /* ========== RENDER RESULTS ========== */
         function renderResults(data) {
-            resultObjects.forEach(o => o.setMap(null));
-            resultObjects = [];
-            const container = document.getElementById('view-summary');
-            container.innerHTML = "";
+            resultObjects.forEach(o => o.setMap(null)); resultObjects = [];
+            const container = document.getElementById("view-summary");
+            const instrContainer = document.getElementById("view-instructions");
+            container.innerHTML = ""; instrContainer.innerHTML = "";
+            const color = PROFILES[currentProfile].color;
 
-            if (currentService === 'vroom') {
-                if (data.routes && data.routes.length > 0) {
-                    let html = `<h4>VROOM Result</h4>`;
+            if (currentService === "vroom") { renderVroom(data, container); return }
+            if (currentService === "table") { renderTable(data, container); return }
 
-                    // Iterar sobre TODAS las rutas (si VROOM usa múltiples vehículos)
-                    const colors = ['#8e44ad', '#e67e22', '#2980b9', '#c0392b'];
+            // Route or Trip
+            const routes = data.routes || data.trips;
+            if (!routes || !routes.length) { container.innerHTML = "<div style='color:var(--danger)'>No se encontró ruta.</div>"; return }
+            const r = routes[0];
+            if (r.geometry) drawPolyline(r.geometry, color);
 
-                    data.routes.forEach((r, idx) => {
-                        const color = colors[idx % colors.length];
-                        if (r.geometry) drawPolyline(r.geometry, color);
+            const dist = (r.distance / 1000).toFixed(1), dur = r.duration;
+            const h = Math.floor(dur / 3600), m = Math.floor((dur % 3600) / 60);
+            container.innerHTML = `<div class="route-summary">
+    <div class="stat-card"><div class="val" style="color:${color}">${dist} km</div><div class="lbl">Distancia total</div></div>
+    <div class="stat-card"><div class="val">${h}h ${m}m</div><div class="lbl">Tiempo estimado</div></div>
+    <div class="stat-card"><div class="val">${PROFILES[currentProfile].icon}</div><div class="lbl">${PROFILES[currentProfile].label}</div></div>
+  </div>`;
 
-                        html += `<div style="border-left:3px solid ${color}; padding-left:5px; margin-bottom:10px;">
-                                    <strong>Vehículo ${r.vehicle}</strong><br>
-                                    Dist: ${(r.distance / 1000).toFixed(1)}km | Dur: ${(r.duration / 60).toFixed(0)}min
-                                    <ul style="font-size:0.8rem; padding-left:15px; margin:5px 0;">`;
-
-                        r.steps.forEach((s) => {
-                            if (s.type === 'job') html += `<li>Job ${s.job} (Arrive: ${formatTime(s.arrival)})</li>`;
-                            else html += `<li>${s.type}</li>`;
-                        });
-                        html += `</ul></div>`;
-                    });
-
-                    if (data.unassigned && data.unassigned.length > 0) {
-                        html += `<div style="color:red; font-weight:bold; margin-top:10px;">
-                                    ⚠️ Sin asignar: ${data.unassigned.length} trabajos
-                                 </div>`;
-                        data.unassigned.forEach(u => {
-                            html += `<small>Job ${u.id}: Capacity/Skill issue?</small><br>`;
+            // Instructions
+            if (r.legs) {
+                let html = `<ul class="step-list">`;
+                r.legs.forEach((leg, li) => {
+                    if (leg.steps) {
+                        leg.steps.forEach(s => {
+                            const icon = MANEUVER_ICONS[s.maneuver?.type] || "➡️";
+                            const name = s.name || "Vía sin nombre";
+                            const d = (s.distance / 1000).toFixed(2);
+                            const t = Math.round(s.duration / 60);
+                            html += `<li class="step-item"><div class="step-icon">${icon}</div><div class="step-info"><div class="street">${name}</div><div class="meta">${d} km • ${t} min</div></div></li>`;
                         });
                     }
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = "No solution found.";
-                }
-            } else {
-                // Logic OSRM Standard (igual que antes)
-                if (data.routes || data.trips) {
-                    const routes = data.routes || data.trips;
-                    routes.forEach((r, i) => {
-                        if (r.geometry) drawPolyline(r.geometry, '#3498db');
-                        container.innerHTML += `<div>Ruta: ${(r.distance / 1000).toFixed(2)}km</div>`;
-                    });
-                }
-            }
+                });
+                html += `</ul>`;
+                instrContainer.innerHTML = html;
+            } else { instrContainer.innerHTML = `<div class="empty-state">Sin instrucciones detalladas.</div>` }
         }
 
-        function formatTime(seconds) {
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            return `${h}:${m.toString().padStart(2, '0')}`;
+        function renderVroom(data, container) {
+            if (!data.routes || !data.routes.length) { container.innerHTML = "No se encontró solución."; return }
+            const colors = ["#a855f7", "#f97316", "#3b82f6", "#ef4444"];
+            let html = `<div class="route-summary">
+    <div class="stat-card"><div class="val" style="color:var(--vroom)">${data.routes.length}</div><div class="lbl">Vehículos usados</div></div>
+    <div class="stat-card"><div class="val">${data.summary?.computing_times?.loading || 0}ms</div><div class="lbl">Tiempo cómputo</div></div>
+  </div>`;
+            data.routes.forEach((r, i) => {
+                const c = colors[i % colors.length];
+                if (r.geometry) drawPolyline(r.geometry, c);
+                html += `<div style="border-left:3px solid ${c};padding:8px 12px;margin-bottom:8px;border-radius:0 6px 6px 0;background:var(--surface2)">
+      <strong>Vehículo ${r.vehicle}</strong> — ${(r.distance / 1000).toFixed(1)}km • ${Math.round(r.duration / 60)}min
+      <div style="margin-top:6px;font-size:.72rem;color:var(--text2)">`;
+                r.steps.forEach(s => {
+                    if (s.type === "job") html += `<div>📦 Job ${s.job} — Arr: ${fmtTime(s.arrival)}</div>`;
+                });
+                html += `</div></div>`;
+            });
+            if (data.unassigned && data.unassigned.length) {
+                html += `<div style="color:var(--danger);font-weight:600;margin-top:10px">⚠️ ${data.unassigned.length} trabajos sin asignar</div>`;
+            }
+            container.innerHTML = html;
         }
+
+        function renderTable(data, container) {
+            if (!data.durations) { container.innerHTML = "Sin datos de matriz."; return }
+            const n = data.durations.length;
+            let html = `<div class="route-summary"><div class="stat-card"><div class="val">${n}×${n}</div><div class="lbl">Dimensión matriz</div></div></div>`;
+            html += `<div class="matrix-wrap"><table class="matrix-table"><tr><th></th>`;
+            for (let j = 0; j < n; j++)html += `<th>P${j + 1}</th>`;
+            html += `</tr>`;
+            for (let i = 0; i < n; i++) {
+                html += `<tr><th>P${i + 1}</th>`;
+                for (let j = 0; j < n; j++) {
+                    const v = Math.round(data.durations[i][j] / 60);
+                    const intensity = Math.min(v / 60, 1);
+                    const bg = `rgba(59,130,246,${intensity * 0.4})`;
+                    html += `<td style="background:${bg}">${v}m</td>`;
+                }
+                html += `</tr>`;
+            }
+            html += `</table></div>`;
+            container.innerHTML = html;
+        }
+
+        /* ========== HELPERS ========== */
+        function fmtTime(s) { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return `${h}:${String(m).padStart(2, "0")}` }
 
         function drawPolyline(encoded, color) {
             const path = google.maps.geometry.encoding.decodePath(encoded);
-            const poly = new google.maps.Polyline({ path, strokeColor: color, strokeWeight: 5, map });
+            const poly = new google.maps.Polyline({ path, strokeColor: color, strokeWeight: 5, strokeOpacity: .85, map });
             resultObjects.push(poly);
             const bounds = new google.maps.LatLngBounds();
             path.forEach(p => bounds.extend(p));
@@ -787,22 +1128,18 @@
         }
 
         function setPanelTab(t) {
-            // (Igual que antes)
-            document.querySelectorAll('.panel-tab').forEach(x => x.classList.remove('active'));
-            if (t === 'summary') {
-                document.getElementById('view-summary').style.display = 'block';
-                document.getElementById('view-json').style.display = 'none';
-                document.querySelectorAll('.panel-tab')[0].classList.add('active');
-            } else {
-                document.getElementById('view-summary').style.display = 'none';
-                document.getElementById('view-json').style.display = 'block';
-                document.querySelectorAll('.panel-tab')[1].classList.add('active');
-            }
+            document.querySelectorAll(".panel-tab[data-panel]").forEach(x => x.classList.remove("active"));
+            document.querySelector(`.panel-tab[data-panel="${t}"]`).classList.add("active");
+            document.getElementById("view-summary").style.display = t === "summary" ? "block" : "none";
+            document.getElementById("view-instructions").style.display = t === "instructions" ? "block" : "none";
+            document.getElementById("view-json").style.display = t === "json" ? "block" : "none";
         }
+
         function togglePanel() {
-            const p = document.getElementById('data-panel');
-            p.style.height = isPanelOpen ? '45px' : '250px';
+            const p = document.getElementById("data-panel");
             isPanelOpen = !isPanelOpen;
+            p.classList.toggle("collapsed");
+            document.querySelector(".panel-tab.toggle").innerText = isPanelOpen ? "⬇" : "⬆";
         }
 
         window.onload = initMap;
