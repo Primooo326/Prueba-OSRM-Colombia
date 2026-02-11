@@ -777,11 +777,11 @@
         /* ========== CONFIG ========== */
         const API_VROOM = "https://osrm.oberon360.com/vroom/", HOST = "http://osrn.oberon360.com";
         const PROFILES = {
-            car: { port: 5000, label: "Carro", icon: "🚗", color: "#3b82f6", specs: "2.0m alto • 1.9m ancho • 2T", h: 2, w: 1.9, wt: "2T" },
-            moto: { port: 5001, label: "Moto", icon: "🏍️", color: "#f97316", specs: "1.5m alto • 1.0m ancho • 300kg", h: 1.5, w: 1, wt: "300kg" },
-            van: { port: 5002, label: "Van", icon: "🚐", color: "#14b8a6", specs: "2.6m alto • 2.2m ancho • 3.5T", h: 2.6, w: 2.2, wt: "3.5T" },
-            truck_medium: { port: 5003, label: "Camión", icon: "🚚", color: "#f59e0b", specs: "3.8m alto • 2.5m ancho • 10T", h: 3.8, w: 2.5, wt: "10T" },
-            truck_heavy: { port: 5004, label: "Pesado", icon: "🚛", color: "#ef4444", specs: "4.5m alto • 2.6m ancho • 40T", h: 4.5, w: 2.6, wt: "40T" }
+            car: { port: "car", label: "Carro", icon: "🚗", color: "#3b82f6", specs: "2.0m alto • 1.9m ancho • 2T", h: 2, w: 1.9, wt: "2T" },
+            moto: { port: "moto", label: "Moto", icon: "🏍️", color: "#f97316", specs: "1.5m alto • 1.0m ancho • 300kg", h: 1.5, w: 1, wt: "300kg" },
+            van: { port: "van", label: "Van", icon: "🚐", color: "#14b8a6", specs: "2.6m alto • 2.2m ancho • 3.5T", h: 2.6, w: 2.2, wt: "3.5T" },
+            truck_medium: { port: "medium", label: "Camión", icon: "🚚", color: "#f59e0b", specs: "3.8m alto • 2.5m ancho • 10T", h: 3.8, w: 2.5, wt: "10T" },
+            truck_heavy: { port: "heavy", label: "Pesado", icon: "🚛", color: "#ef4444", specs: "4.5m alto • 2.6m ancho • 40T", h: 4.5, w: 2.6, wt: "40T" }
         };
         const SVC_DESC = {
             route: "Calcula la ruta más óptima entre los puntos seleccionados.",
