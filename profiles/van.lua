@@ -132,7 +132,6 @@ function process_node(profile, node, result, relations)
   local highway2 = node:get_value_by_key("highway")
   if highway2 == "traffic_signals" then
     result.traffic_lights = true
-    result.duration = (profile.properties.traffic_signal_penalty or 0)
   end
 
   if Handlers and Handlers.process_node then Handlers.process_node(profile, node, result, relations) end

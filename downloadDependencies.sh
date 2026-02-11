@@ -1,4 +1,12 @@
-cd profiles/lib
+#!/bin/bash
+set -e
+
+# Auto-detectar directorio del script
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LIB_DIR="$SCRIPT_DIR/profiles/lib"
+
+mkdir -p "$LIB_DIR"
+cd "$LIB_DIR"
 
 base_url="https://raw.githubusercontent.com/Project-OSRM/osrm-backend/master/profiles/lib"
 
@@ -15,5 +23,4 @@ wget -N "${base_url}/tags.lua"
 wget -N "${base_url}/utils.lua"
 wget -N "${base_url}/way_handlers.lua"
 
-# Volver a la raíz
-cd ../..
+echo "✅ Dependencias descargadas en: $LIB_DIR"

@@ -3,7 +3,7 @@
 # ==========================================
 # CONFIGURACIÓN
 # ==========================================
-WORK_DIR="/home/DesarrolloTSI/Prueba-OSRM-Colombia" # IMPORTANTE: Ajusta esta ruta si es diferente
+WORK_DIR="$(cd "$(dirname "$0")" && pwd)" # Auto-detecta la ruta del proyecto
 DATA_DIR="$WORK_DIR/data"
 MAP_FILE="colombia-latest.osm.pbf"
 MAP_URL="http://download.geofabrik.de/south-america/colombia-latest.osm.pbf"
