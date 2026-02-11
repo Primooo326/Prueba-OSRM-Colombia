@@ -39,10 +39,10 @@ function setup()
     default_mode              = mode.driving,
     default_speed             = 10,
     oneway_handling           = true,
-    side_road_multiplier      = 0.8,
-    turn_penalty              = 10,  -- Colombia: giros con congestión
-    speed_reduction           = 0.8,
-    turn_bias                 = 1.075,
+    side_road_multiplier      = 0.7,
+    turn_penalty              = 12,  -- Colombia: giros con congestión pesada
+    speed_reduction           = 0.7, -- Reducción extra por congestión general
+    turn_bias                 = 1.1,
     cardinal_directions       = false,
 
     -- DIMENSIONES COCHE ESTÁNDAR
@@ -74,23 +74,23 @@ function setup()
     excludable = Sequence { Set {'toll'}, Set {'motorway'}, Set {'ferry'} },
     avoid = Set { 'area', 'reversible', 'impassable', 'hov_lanes', 'steps', 'construction', 'proposed' },
 
-    -- VELOCIDADES CAR — Realistas Colombia (congestión + topografía)
+    -- VELOCIDADES CAR — Promedios reales Colombia (incl. congestión + curvas + pueblos)
     speeds = Sequence {
       highway = {
-        motorway        = 60,  -- Autopista Norte, dobles calzadas
-        motorway_link   = 40,
-        trunk           = 50,  -- Troncales nacionales
-        trunk_link      = 35,
-        primary         = 35,  -- Vías principales ciudad
-        primary_link    = 25,
-        secondary       = 25,  -- Conexiones entre barrios
-        secondary_link  = 20,
-        tertiary        = 20,  -- Vías terciarias
-        tertiary_link   = 15,
-        unclassified    = 18,  -- Rural / sin clasificar
-        residential     = 15,  -- Barrios residenciales
-        living_street   = 10,  -- Zonas peatonales
-        service         = 12
+        motorway        = 45,  -- Autopistas reales promedio con tráfico
+        motorway_link   = 30,
+        trunk           = 38,  -- Troncales nacionales (curvas, pueblos)
+        trunk_link      = 25,
+        primary         = 25,  -- Vías principales ciudad con semáforos
+        primary_link    = 18,
+        secondary       = 18,  -- Conexiones entre barrios
+        secondary_link  = 14,
+        tertiary        = 14,  -- Vías terciarias
+        tertiary_link   = 10,
+        unclassified    = 12,  -- Rural / sin clasificar
+        residential     = 12,  -- Barrios residenciales
+        living_street   = 6,   -- Zonas peatonales
+        service         = 8
       }
     },
 
@@ -100,10 +100,10 @@ function setup()
     route_speeds = { ferry = 5, shuttle_train = 10 },
     bridge_speeds = { movable = 5 },
     -- Colombia: superficies sin pavimentar penalizan drásticamente
-    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 60, compacted = 40, fine_gravel = 25, paving_stones = 40, metal = 40, bricks = 30, grass = 15, wood = 20, sett = 25, grass_paver = 15, gravel = 10, unpaved = 10, ground = 10, dirt = 5, pebblestone = 15, tartan = 30, cobblestone = 20, clay = 8, earth = 8, stone = 10, rocky = 8, sand = 5, mud = 3 },
-    tracktype_speeds = { grade1 = 40, grade2 = 25, grade3 = 15, grade4 = 10, grade5 = 5 },
-    smoothness_speeds = { intermediate = 40, bad = 20, very_bad = 10, horrible = 5, very_horrible = 3, impassable = 0 },
-    maxspeed_table_default = { urban = 25, rural = 50, trunk = 55, motorway = 65 },
+    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 35, compacted = 25, fine_gravel = 15, paving_stones = 25, metal = 25, bricks = 18, grass = 8, wood = 12, sett = 15, grass_paver = 8, gravel = 10, unpaved = 8, ground = 6, dirt = 4, pebblestone = 10, tartan = 18, cobblestone = 12, clay = 5, earth = 5, stone = 6, rocky = 5, sand = 3, mud = 2 },
+    tracktype_speeds = { grade1 = 25, grade2 = 15, grade3 = 10, grade4 = 6, grade5 = 3 },
+    smoothness_speeds = { intermediate = 30, bad = 15, very_bad = 8, horrible = 4, very_horrible = 2, impassable = 0 },
+    maxspeed_table_default = { urban = 20, rural = 38, trunk = 42, motorway = 50 },
     maxspeed_table = {},
     relation_types = Sequence { "route" },
     highway_turn_classification = {},

@@ -39,10 +39,10 @@ function setup()
     default_mode              = mode.driving,
     default_speed             = 10,
     oneway_handling           = true,
-    side_road_multiplier      = 0.8,
-    turn_penalty              = 12,  -- Van más lenta en giros (tamaño + congestión)
-    speed_reduction           = 0.8,
-    turn_bias                 = 1.075,
+    side_road_multiplier      = 0.7,
+    turn_penalty              = 14,  -- Van lenta en giros + congestión
+    speed_reduction           = 0.65, -- Van sufre más la congestión
+    turn_bias                 = 1.1,
     cardinal_directions       = false,
 
     -- DIMENSIONES VAN
@@ -64,23 +64,23 @@ function setup()
     excludable = Sequence { Set {'toll'}, Set {'motorway'}, Set {'ferry'} },
     avoid = Set { 'area', 'reversible', 'impassable', 'hov_lanes', 'steps', 'construction', 'proposed' },
 
-    -- VELOCIDADES VAN — Realistas Colombia (delivery / carga ligera)
+    -- VELOCIDADES VAN — Promedios reales Colombia (delivery, más lenta que carro)
     speeds = Sequence {
       highway = {
-        motorway        = 55,  -- Dobles calzadas
-        motorway_link   = 38,
-        trunk           = 48,  -- Troncales nacionales
-        trunk_link      = 32,
-        primary         = 30,  -- Vías principales ciudad
-        primary_link    = 22,
-        secondary       = 22,  -- Conexiones barrios
-        secondary_link  = 18,
-        tertiary        = 18,
-        tertiary_link   = 14,
-        unclassified    = 15,
-        residential     = 12,  -- Barrios, maniobras de entrega
-        living_street   = 8,
-        service         = 10
+        motorway        = 40,  -- Dobles calzadas, van más lenta
+        motorway_link   = 28,
+        trunk           = 35,  -- Troncales nacionales
+        trunk_link      = 22,
+        primary         = 22,  -- Vías principales ciudad
+        primary_link    = 16,
+        secondary       = 16,  -- Conexiones barrios
+        secondary_link  = 12,
+        tertiary        = 12,
+        tertiary_link   = 10,
+        unclassified    = 10,
+        residential     = 10,  -- Barrios, entregas
+        living_street   = 5,
+        service         = 8
       }
     },
 
@@ -90,10 +90,10 @@ function setup()
     route_speeds = { ferry = 5, shuttle_train = 10 },
     bridge_speeds = { movable = 5 },
     -- Colombia: superficies sin pavimentar drásticamente más lentas
-    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 50, compacted = 35, fine_gravel = 20, paving_stones = 35, metal = 35, bricks = 25, grass = 10, wood = 15, sett = 20, grass_paver = 10, gravel = 10, unpaved = 10, ground = 8, dirt = 5, pebblestone = 12, tartan = 25, cobblestone = 18, clay = 6, earth = 6, stone = 8, rocky = 6, sand = 4, mud = 3 },
-    tracktype_speeds = { grade1 = 35, grade2 = 20, grade3 = 12, grade4 = 8, grade5 = 5 },
-    smoothness_speeds = { intermediate = 35, bad = 18, very_bad = 8, horrible = 4, very_horrible = 2, impassable = 0 },
-    maxspeed_table_default = { urban = 22, rural = 48, trunk = 50, motorway = 58 },
+    surface_speeds = { asphalt = nil, concrete = nil, ["concrete:plates"] = nil, ["concrete:lanes"] = nil, paved = nil, cement = 30, compacted = 20, fine_gravel = 12, paving_stones = 22, metal = 22, bricks = 16, grass = 5, wood = 10, sett = 14, grass_paver = 5, gravel = 8, unpaved = 6, ground = 5, dirt = 3, pebblestone = 8, tartan = 16, cobblestone = 10, clay = 4, earth = 4, stone = 5, rocky = 4, sand = 3, mud = 2 },
+    tracktype_speeds = { grade1 = 22, grade2 = 14, grade3 = 8, grade4 = 5, grade5 = 3 },
+    smoothness_speeds = { intermediate = 25, bad = 12, very_bad = 6, horrible = 3, very_horrible = 2, impassable = 0 },
+    maxspeed_table_default = { urban = 18, rural = 35, trunk = 38, motorway = 45 },
     maxspeed_table = {},
     relation_types = Sequence { "route" },
     highway_turn_classification = {},
