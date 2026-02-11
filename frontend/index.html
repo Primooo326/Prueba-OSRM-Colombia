@@ -1014,7 +1014,7 @@
                     });
                 } else {
                     const coords = points.map(p => `${p.lng},${p.lat}`).join(";");
-                    url = `${HOST}:${pf.port}/${currentService}/v1/driving/${coords}?overview=full&geometries=polyline`;
+                    url = `${HOST}/${pf.port}/${currentService}/v1/driving/${coords}?overview=full&geometries=polyline`;
                     if (currentService === "route") { const stepsEl = document.getElementById("p-steps"); if (stepsEl && stepsEl.checked) url += "&steps=true" }
                     if (currentService === "trip") url += `&roundtrip=${document.getElementById("p-roundtrip").value}`;
                     if (currentService === "table") url += `&annotations=duration`;
